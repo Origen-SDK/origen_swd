@@ -9,7 +9,8 @@ Gem::Specification.new do |spec|
   spec.email         = ["Ronnie.Lajaunie@freescale.com"]
   spec.summary       = "Driver for single-wire-debug interface."
   spec.homepage      = "http://origen-sdk.org/origen_swd"
-
+  spec.license       = 'LGPL-3'
+  
   spec.required_ruby_version     = '>= 1.9.3'
   spec.required_rubygems_version = '>= 1.8.11'
 
