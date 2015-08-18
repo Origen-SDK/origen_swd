@@ -12,7 +12,7 @@ class OrigenSWDApplication < Origen::Application
 
   # To enable deployment of your documentation to a web server (via the 'origen web'
   # command) fill in these attributes.
-  config.web_directory = "git@github.com:Origen-SDK/Origen-SDK.github.io.git/swd"
+  config.web_directory = "git@github.com/Origen-SDK/Origen-SDK.github.io.git/swd"
   config.web_domain = "http://origen-sdk.org/swd"
   
   config.semantically_version = true
