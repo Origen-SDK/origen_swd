@@ -1,0 +1,82 @@
+% render "layouts/basic.html" do
+
+%# HTML tags can be embedded in mark down files if you want to do specific custom
+%# formatting like this, but in most cases that is not required.
+<h1><%= Origen.app.namespace %> <span style="font-size: 14px">(<%= Origen.app.version %>)</span></h1>
+
+### Purpose
+
+This application provides a SWD driver.
+
+### How To Import
+
+In your Gemfile add:
+
+~~~ruby
+gem "origen_swd", ">= <%= Origen.app.version %>"
+~~~
+
+or if your application is a plugin add this to your <code>.gemspec</code>
+
+~~~ruby
+spec.add_development_dependency "origen_swd", ">= <%= Origen.app.version %>"
+~~~
+
+__NOTE:__ You will also need to include <code>require 'origen_swd'</code> somewhere in your environment.  This can be done in <code>config/environment.rb</code> for example.
+
+
+### How To Use
+
+Include the <code>OrigenSWD</code> module to add a JTAG driver to your class and
+define the required pins.
+
+Including the module adds a <code>swd</code> method which will return an instance of
+[<code>OrigenSWD::Driver</code>](<%= path "api/OrigenSWD/Driver.html" %>).
+
+Here is an example integration:
+
+~~~ruby
+
+class DUT
+  include OrigenSWD
+  include Origen::Pins 
+
+  def initialize(options = {})
+    add_pin :swd_clk 
+    add_pin :swd_dio
+  end
+end
+
+
+DUT.new.swd # => An instance of OrigenSWD::Driver
+~~~
+
+
+### How To Setup a Development Environment
+
+[Clone the repository from Github](https://github.com/Origen-SDK/origen_swd).
+
+An instance of the OrigenSWD driver is hooked up to a dummy DUT
+object for use in the console:
+
+~~~
+origen i
+
+> $dut.swd
+=> #<OrigenSWD::Driver:0x0000001ee48e78>
+~~~
+
+Follow the instructions here if you want to make a 3rd party app
+workspace use your development copy of the OrigenSWD plugin:
+[Setting up a Plugin Development Environment](http://origen-sdk.org/origen/latest/guides/plugins)
+
+This plugin also contains a test suite, makes sure this passes before committing
+any changes!
+
+~~~
+origen examples
+~~~
+
+<%= disqus_comments %>
+
+% end
