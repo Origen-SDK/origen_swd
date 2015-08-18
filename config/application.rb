@@ -7,7 +7,7 @@ class OrigenSWDApplication < Origen::Application
 
   self.name = "origen_swd"
   self.namespace = "OrigenSWD"
-  config.rc_url = "https://github.com/Origen-SDK/origen_swd.git"
+  config.rc_url = "git@github.com/Origen-SDK/origen_swd.git"
   config.release_externally = true
 
   # To enable deployment of your documentation to a web server (via the 'origen web'
