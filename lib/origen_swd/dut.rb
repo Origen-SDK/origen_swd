@@ -6,20 +6,19 @@ module OrigenSWD
   # It is not included when this library is imported.
   class DUT
     include OrigenSWD
-    include Origen::Callbacks 
-    include Origen::Registers 
-    include Origen::Pins 
+    include Origen::Callbacks
+    include Origen::Registers
+    include Origen::Pins
 
     def initialize(options = {})
       add_reg :test, 0x0, 32, data: { pos: 0, bits: 32 },
-                               bit: { pos: 0 }
-      add_pin :swd_clk 
+                              bit:  { pos: 0 }
+      add_pin :swd_clk
       add_pin :swd_dio
     end
 
     def startup(options)
       $tester.set_timeset('swd', 40)
     end
-    
   end
 end
