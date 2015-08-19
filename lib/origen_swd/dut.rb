@@ -13,6 +13,11 @@ module OrigenSWD
     # Initializes simple dut model with test register and required swd pins
     # options - any miscellaneous custom arguments
     # Returns nothing.
+    #
+    # Examples
+    #
+    #   $dut = OrigenSWD::DUT.new
+    #
     def initialize(options = {})
       add_reg :test, 0x0, 32, data: { pos: 0, bits: 32 },
                               bit:  { pos: 0 }
