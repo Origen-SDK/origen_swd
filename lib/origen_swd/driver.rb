@@ -11,6 +11,12 @@ module OrigenSWD
     # Initialize class variables
     # owner - parent object
     # options - any miscellaneous custom arguments
+    # Returns nothing.
+    #
+    # Examples
+    #
+    #   DUT.new.swd
+    #
     def initialize(owner, options = {})
       @owner = owner
       @current_apaddr = 0

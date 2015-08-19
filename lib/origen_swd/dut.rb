@@ -11,6 +11,8 @@ module OrigenSWD
     include Origen::Pins
 
     # Initializes simple dut model with test register and required swd pins
+    # options - any miscellaneous custom arguments
+    # Returns nothing.
     def initialize(options = {})
       add_reg :test, 0x0, 32, data: { pos: 0, bits: 32 },
                               bit:  { pos: 0 }
@@ -19,7 +21,8 @@ module OrigenSWD
     end
 
     # Add any custom startup business here.
-    # Ex. initialize timeset
+    # options - any miscellaneous custom arguments
+    # Returns nothing.
     def startup(options = {})
       $tester.set_timeset('swd', 40)
     end
