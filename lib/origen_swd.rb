@@ -1,6 +1,7 @@
 require 'origen'
 require_relative '../config/application.rb'
 
+# Include this module to add a SWD driver to your class
 module OrigenSWD
   autoload :Driver, 'origen_swd/driver'
 
