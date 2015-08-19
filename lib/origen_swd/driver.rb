@@ -9,6 +9,8 @@ module OrigenSWD
     attr_reader :owner
 
     # Initialize class variables
+    # owner - parent object
+    # options - any miscellaneous custom arguments
     def initialize(owner, options = {})
       @owner = owner
       @current_apaddr = 0
@@ -16,10 +18,11 @@ module OrigenSWD
     end
 
     # Sends data stream with SWD protocol
-    #  -data = data to be sent
-    #  -size = the length of data
-    #  -options[:overlay] = string for pattern label to facilitate pattern overlay
-    #  -no return value
+    # data - data to be sent
+    # size - the length of data
+    # options - any miscellaneous custom arguments
+    # options[:overlay] - string for pattern label to facilitate pattern overlay
+    # Returns nothing.
     def send_data(data, size, options = {})
       if options.key?(:overlay)
         $tester.label(options[:overlay])
@@ -41,8 +44,10 @@ module OrigenSWD
     end
 
     # Recieves data stream with SWD protocol
-    #  -size = the length of data
-    #  -options[:compare_data] = data to be compared, only compared if options is set
+    # size - the length of data
+    # options - any miscellaneous custom arguments
+    # options[:compare_data] - data to be compared, only compared if options is set
+    # Returns nothing.
     def get_data(size, options = {})
       should_store = $dut.pin(:swd_dio).is_to_be_stored?
       owner.pin(:swd_dio).dont_care
@@ -54,8 +59,8 @@ module OrigenSWD
     end
 
     # Sends specified number of '0' bits
-    #  -size = the length of data
-    #  -no return value
+    # size - the length of data
+    # Returns nothing.
     def swd_dio_to_0(size)
       owner.pin(:swd_dio).drive(0)
       size.times do |bit|
