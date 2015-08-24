@@ -20,11 +20,11 @@ module OrigenSWD
     def initialize(options = {})
       # Sample DPACC register
       add_reg :test, 0x04, 32, data: { pos: 0, bits: 32 },
-                                bit: { pos: 2 }
-      
+                               bit:  { pos: 2 }
+
       # Sample DPACC register
       add_reg :select, 0x08, 32, data: { pos: 0, bits: 32 }
-      
+
       # Sample APACC register
       add_reg :stat, 0x00, 32, data: { pos: 0, bits: 32 }
       add_reg :control, 0x01, 32, data: { pos: 0, bits: 32 }

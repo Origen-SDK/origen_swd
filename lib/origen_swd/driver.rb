@@ -24,7 +24,7 @@ module OrigenSWD
     #
     def initialize(owner, options = {})
       @owner = owner
-      #validate_pins
+      # validate_pins
 
       @current_apaddr = 0
       @orundetect = 0
@@ -46,7 +46,7 @@ module OrigenSWD
       receive_acknowledgement
       receive_payload(reg_or_val, options)
     end
-    
+
     # Write data to Debug Port or Access Port
     #
     # @param [Integer] ap_dp A single bit indicating whether the Debug Port or the Access Port Register
@@ -61,7 +61,7 @@ module OrigenSWD
       addr = reg_or_val.respond_to?(:address) ? reg_or_val.address : reg_or_val
       send_header(ap_dp, 0, addr)       # send write-specific header (rnw = 0)
       receive_acknowledgement
-      
+
       if reg_or_val.respond_to?(:data)
         reg_or_val.data = wdata
       else
@@ -75,7 +75,7 @@ module OrigenSWD
     # @param [Integer] data Data to be sent
     # @param [Integer] size The length of data
     # @param [Hash] options Options to customize the operation
-    # @option options [String] :overlay String for pattern label to 
+    # @option options [String] :overlay String for pattern label to
     #   facilitate pattern overlay
     def send_data(data, size, options = {})
       # Warn caller that this method is being deprecated
@@ -104,7 +104,7 @@ module OrigenSWD
     #
     # @param [Integer] size The length of data
     # @param [Hash] options Options to customize the operation
-    # @option options [String] :compare_data Data to be compared, only compared 
+    # @option options [String] :compare_data Data to be compared, only compared
     #   if options is set
     def get_data(size, options = {})
       # Warn caller that this method is being deprecated
@@ -130,7 +130,7 @@ module OrigenSWD
     end
 
     private
-    
+
     # Send SWD Packet header
     #   ------------------------------------------------------------------------
     #   | Start | APnDP |   1   | ADDR[2] | ADDR[3] | Parity |  Stop  |  Park  |
@@ -178,14 +178,14 @@ module OrigenSWD
       swd_dio.drive(1)
       $tester.cycle(repeat: trn + 1)
     end
-    
+
     # Get (read) the data payload
     #
     # @param [Integer, Origen::Register::Reg, Origen::Register::BitCollection, Origen::Register::Bit] reg_or_val
     #   Value to be read. If a reg/bit collection is supplied this can be pre-marked for
     #   read, store or overlay and which will result in the requested action being applied to
     #   the cycles corresponding to those bits only (don't care cycles will be generated for the others).
-    # @option options [String] :overlay String for pattern label to 
+    # @option options [String] :overlay String for pattern label to
     #   facilitate pattern overlay
     def receive_payload(reg_or_val, options)
       cc 'Read Data Payload phase'
@@ -201,14 +201,14 @@ module OrigenSWD
       cc 'Send Read ACK bits'
       wait_trn
     end
-    
+
     # Send (write) the data payload
     #
     # @param [Integer, Origen::Register::Reg, Origen::Register::BitCollection, Origen::Register::Bit] reg_or_val
     #   Value to be written. If a reg/bit collection is supplied this can be pre-marked for
     #   read, store or overlay and which will result in the requested action being applied to
     #   the cycles corresponding to those bits only (don't care cycles will be generated for the others).
-    # @option options [String] :overlay String for pattern label to 
+    # @option options [String] :overlay String for pattern label to
     #   facilitate pattern overlay
     def send_payload(reg_or_val, options)
       cc 'Write Data Payload phase'
@@ -218,7 +218,7 @@ module OrigenSWD
       cc 'SWD 32-Bit Write Start'
       options[:read] = false
       shift_payload(reg_or_val, options)
-      
+
       cc 'Send Write Parity Bit'
       wdata = reg_or_val.respond_to?(:data) ? reg_or_val.data : reg_or_val
       parity_bit = swd_xor_calc(32, wdata)
@@ -231,7 +231,7 @@ module OrigenSWD
     #   Value to be shifted. If a reg/bit collection is supplied this can be pre-marked for
     #   read, store or overlay and which will result in the requested action being applied to
     #   the cycles corresponding to those bits only (don't care cycles will be generated for the others).
-    # @option options [String] :overlay String for pattern label to 
+    # @option options [String] :overlay String for pattern label to
     #   facilitate pattern overlay
     def shift_payload(reg_or_val, options)
       cc options[:arm_debug_comment] if options.key?(:arm_debug_comment)
@@ -304,6 +304,5 @@ module OrigenSWD
     def swd_dio
       owner.pin(:swd_dio)
     end
-    
   end
 end
