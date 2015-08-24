@@ -8,12 +8,10 @@
 //   Application
 //     Source:    https://github.com/Origen-SDK/origen_swd.git
 //     Version:   0.2.0
-//     Workspace: /proj/tec_ulp1_verif/users/b01784/tv1/rgen_sandbox/origen/origen_swd
 //     Branch:    master(119fb4b367c)
 //   Origen
 //     Source:    https://github.com/Origen-SDK/origen
 //     Version:   0.2.3
-//     Workspace: /home/b01784/.origen/gems/ruby/2.1.0/gems/origen-0.2.3
 // ***************************************************************************
 import tset swd;                                                                                
 svm_only_file = no;                                                                             

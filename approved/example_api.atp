@@ -1,0 +1,466 @@
+// ***************************************************************************
+// GENERATED:
+//   Time:    23-Aug-2015 22:08PM
+//   By:      Ronnie Lajaunie
+//   Command: origen g example_api -t debug.rb
+// ***************************************************************************
+// ENVIRONMENT:
+//   Application
+//     Source:    git@github.com:Origen-SDK/origen_swd.git
+//     Version:   0.4.0
+//     Branch:    master(a5d862113ee) (+local edits)
+//   Origen
+//     Source:    https://github.com/Origen-SDK/origen
+//     Version:   0.2.3
+//   Plugins
+//     origen_doc_helpers:       0.2.0
+// ***************************************************************************
+import tset swd;                                                                                
+svm_only_file = no;                                                                             
+opcode_mode = extended;                                                                         
+compressed = yes;                                                                               
+                                                                                                
+vector ($tset, swd_clk, swd_dio)                                                                
+{                                                                                               
+start_label pattern_st:                                                                         
+// Header phase
+// Send Start Bit
+                                                                 > swd                          1 1 ;
+// Send APnDP Bit (DP or AP Access Register Bit)
+                                                                 > swd                          1 1 ;
+// Send RnW Bit (read or write bit)
+                                                                 > swd                          1 0 ;
+// Send Address Bits (2 bits)
+repeat 2                                                         > swd                          1 0 ;
+// Send Parity Bit
+                                                                 > swd                          1 0 ;
+// Send Stop Bit
+                                                                 > swd                          1 0 ;
+// Send Park Bit
+                                                                 > swd                          1 1 ;
+// Acknowledge Response phase
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// Write Data Payload phase
+// Send ACK Bits
+                                                                 > swd                          1 1 ;
+// SWD 32-Bit Write Start
+write_ovl:                                                                                      
+// SWD Data Pin 0:                                                                              
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 1:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 2:                                                                              
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 3:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 4:                                                                              
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 5:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 6:                                                                              
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 7:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 8:                                                                              
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 9:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 10:                                                                             
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 11:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 12:                                                                             
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 13:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 14:                                                                             
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 15:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 16:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 17:                                                                             
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 18:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 19:                                                                             
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 20:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 21:                                                                             
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 22:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 23:                                                                             
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 24:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 25:                                                                             
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 26:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 27:                                                                             
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 28:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 29:                                                                             
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 30:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 31:                                                                             
+                                                                 > swd                          1 1 ;
+// Send Write Parity Bit
+                                                                 > swd                          1 0 ;
+// SWD DIO to 0 for 10 cycles
+repeat 10                                                        > swd                          1 0 ;
+// Header phase
+// Send Start Bit
+                                                                 > swd                          1 1 ;
+// Send APnDP Bit (DP or AP Access Register Bit)
+                                                                 > swd                          1 1 ;
+// Send RnW Bit (read or write bit)
+                                                                 > swd                          1 1 ;
+// Send Address Bits (2 bits)
+repeat 2                                                         > swd                          1 0 ;
+// Send Parity Bit
+                                                                 > swd                          1 1 ;
+// Send Stop Bit
+                                                                 > swd                          1 0 ;
+// Send Park Bit
+                                                                 > swd                          1 1 ;
+// Acknowledge Response phase
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// Read Data Payload phase
+// SWD 32-Bit Read Data Start
+repeat 32                                                        > swd                          1 X ;
+// SWD 32-Bit Read Data End
+// Get Read Parity Bit
+                                                                 > swd                          1 X ;
+// Send Read ACK bits
+                                                                 > swd                          1 1 ;
+repeat 10                                                        > swd                          1 0 ;
+// Header phase
+// Send Start Bit
+                                                                 > swd                          1 1 ;
+// Send APnDP Bit (DP or AP Access Register Bit)
+                                                                 > swd                          1 1 ;
+// Send RnW Bit (read or write bit)
+                                                                 > swd                          1 1 ;
+// Send Address Bits (2 bits)
+repeat 2                                                         > swd                          1 0 ;
+// Send Parity Bit
+                                                                 > swd                          1 1 ;
+// Send Stop Bit
+                                                                 > swd                          1 0 ;
+// Send Park Bit
+                                                                 > swd                          1 1 ;
+// Acknowledge Response phase
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// Read Data Payload phase
+// SWD 32-Bit Read Data Start
+repeat 5                                                         > swd                          1 L ;
+                                                                 > swd                          1 H ;
+repeat 7                                                         > swd                          1 L ;
+                                                                 > swd                          1 H ;
+repeat 18                                                        > swd                          1 L ;
+// SWD 32-Bit Read Data End
+// Get Read Parity Bit
+                                                                 > swd                          1 X ;
+// Send Read ACK bits
+                                                                 > swd                          1 1 ;
+repeat 10                                                        > swd                          1 0 ;
+// Header phase
+// Send Start Bit
+                                                                 > swd                          1 1 ;
+// Send APnDP Bit (DP or AP Access Register Bit)
+                                                                 > swd                          1 0 ;
+// Send RnW Bit (read or write bit)
+                                                                 > swd                          1 0 ;
+// Send Address Bits (2 bits)
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// Send Parity Bit
+                                                                 > swd                          1 1 ;
+// Send Stop Bit
+                                                                 > swd                          1 0 ;
+// Send Park Bit
+                                                                 > swd                          1 1 ;
+// Acknowledge Response phase
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// Write Data Payload phase
+// Send ACK Bits
+                                                                 > swd                          1 1 ;
+// SWD 32-Bit Write Start
+// SWD Data Pin 0:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 1:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 2:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 3:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 4:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 5:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 6:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 7:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 8:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 9:                                                                              
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 10:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 11:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 12:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 13:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 14:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 15:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 16:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 17:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 18:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 19:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 20:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 21:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 22:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 23:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 24:                                                                             
+                                                                 > swd                          1 1 ;
+// SWD Data Pin 25:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 26:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 27:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 28:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 29:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 30:                                                                             
+                                                                 > swd                          1 0 ;
+// SWD Data Pin 31:                                                                             
+                                                                 > swd                          1 0 ;
+// Send Write Parity Bit
+                                                                 > swd                          1 1 ;
+repeat 10                                                        > swd                          1 0 ;
+// Header phase
+// Send Start Bit
+                                                                 > swd                          1 1 ;
+// Send APnDP Bit (DP or AP Access Register Bit)
+                                                                 > swd                          1 0 ;
+// Send RnW Bit (read or write bit)
+                                                                 > swd                          1 1 ;
+// Send Address Bits (2 bits)
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// Send Parity Bit
+                                                                 > swd                          1 0 ;
+// Send Stop Bit
+                                                                 > swd                          1 0 ;
+// Send Park Bit
+                                                                 > swd                          1 1 ;
+// Acknowledge Response phase
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// Read Data Payload phase
+// SWD 32-Bit Read Data Start
+repeat 32                                                        > swd                          1 X ;
+// SWD 32-Bit Read Data End
+// Get Read Parity Bit
+                                                                 > swd                          1 X ;
+// Send Read ACK bits
+                                                                 > swd                          1 1 ;
+repeat 10                                                        > swd                          1 0 ;
+// Header phase
+// Send Start Bit
+                                                                 > swd                          1 1 ;
+// Send APnDP Bit (DP or AP Access Register Bit)
+                                                                 > swd                          1 0 ;
+// Send RnW Bit (read or write bit)
+                                                                 > swd                          1 0 ;
+// Send Address Bits (2 bits)
+repeat 2                                                         > swd                          1 0 ;
+// Send Parity Bit
+                                                                 > swd                          1 0 ;
+// Send Stop Bit
+                                                                 > swd                          1 0 ;
+// Send Park Bit
+                                                                 > swd                          1 1 ;
+// Acknowledge Response phase
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// Write Data Payload phase
+// Send ACK Bits
+                                                                 > swd                          1 1 ;
+// SWD 32-Bit Write Start
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+repeat 2                                                         > swd                          1 0 ;
+repeat 2                                                         > swd                          1 1 ;
+repeat 26                                                        > swd                          1 0 ;
+// Send Write Parity Bit
+                                                                 > swd                          1 1 ;
+repeat 10                                                        > swd                          1 0 ;
+// Header phase
+// Send Start Bit
+                                                                 > swd                          1 1 ;
+// Send APnDP Bit (DP or AP Access Register Bit)
+                                                                 > swd                          1 0 ;
+// Send RnW Bit (read or write bit)
+                                                                 > swd                          1 0 ;
+// Send Address Bits (2 bits)
+repeat 2                                                         > swd                          1 0 ;
+// Send Parity Bit
+                                                                 > swd                          1 0 ;
+// Send Stop Bit
+                                                                 > swd                          1 0 ;
+// Send Park Bit
+                                                                 > swd                          1 1 ;
+// Acknowledge Response phase
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// Write Data Payload phase
+// Send ACK Bits
+                                                                 > swd                          1 1 ;
+// SWD 32-Bit Write Start
+repeat 4                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+repeat 27                                                        > swd                          1 0 ;
+// Send Write Parity Bit
+                                                                 > swd                          1 1 ;
+repeat 10                                                        > swd                          1 0 ;
+// Header phase
+// Send Start Bit
+                                                                 > swd                          1 1 ;
+// Send APnDP Bit (DP or AP Access Register Bit)
+                                                                 > swd                          1 0 ;
+// Send RnW Bit (read or write bit)
+                                                                 > swd                          1 1 ;
+// Send Address Bits (2 bits)
+repeat 2                                                         > swd                          1 0 ;
+// Send Parity Bit
+                                                                 > swd                          1 1 ;
+// Send Stop Bit
+                                                                 > swd                          1 0 ;
+// Send Park Bit
+                                                                 > swd                          1 1 ;
+// Acknowledge Response phase
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// Read Data Payload phase
+// SWD 32-Bit Read Data Start
+repeat 32                                                        > swd                          1 X ;
+// SWD 32-Bit Read Data End
+// Get Read Parity Bit
+                                                                 > swd                          1 X ;
+// Send Read ACK bits
+                                                                 > swd                          1 1 ;
+repeat 10                                                        > swd                          1 0 ;
+// Header phase
+// Send Start Bit
+                                                                 > swd                          1 1 ;
+// Send APnDP Bit (DP or AP Access Register Bit)
+                                                                 > swd                          1 0 ;
+// Send RnW Bit (read or write bit)
+                                                                 > swd                          1 1 ;
+// Send Address Bits (2 bits)
+repeat 2                                                         > swd                          1 0 ;
+// Send Parity Bit
+                                                                 > swd                          1 1 ;
+// Send Stop Bit
+                                                                 > swd                          1 0 ;
+// Send Park Bit
+                                                                 > swd                          1 1 ;
+// Acknowledge Response phase
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// Read Data Payload phase
+// SWD 32-Bit Read Data Start
+repeat 4                                                         > swd                          1 L ;
+                                                                 > swd                          1 H ;
+repeat 27                                                        > swd                          1 L ;
+// SWD 32-Bit Read Data End
+// Get Read Parity Bit
+                                                                 > swd                          1 X ;
+// Send Read ACK bits
+                                                                 > swd                          1 1 ;
+repeat 10                                                        > swd                          1 0 ;
+// Header phase
+// Send Start Bit
+                                                                 > swd                          1 1 ;
+// Send APnDP Bit (DP or AP Access Register Bit)
+                                                                 > swd                          1 0 ;
+// Send RnW Bit (read or write bit)
+                                                                 > swd                          1 1 ;
+// Send Address Bits (2 bits)
+repeat 2                                                         > swd                          1 0 ;
+// Send Parity Bit
+                                                                 > swd                          1 1 ;
+// Send Stop Bit
+                                                                 > swd                          1 0 ;
+// Send Park Bit
+                                                                 > swd                          1 1 ;
+// Acknowledge Response phase
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// Read Data Payload phase
+// SWD 32-Bit Read Data Start
+repeat 4                                                         > swd                          1 L ;
+                                                                 > swd                          1 H ;
+repeat 27                                                        > swd                          1 L ;
+// SWD 32-Bit Read Data End
+// Get Read Parity Bit
+                                                                 > swd                          1 X ;
+// Send Read ACK bits
+                                                                 > swd                          1 1 ;
+repeat 10                                                        > swd                          1 0 ;
+// Header phase
+// Send Start Bit
+                                                                 > swd                          1 1 ;
+// Send APnDP Bit (DP or AP Access Register Bit)
+                                                                 > swd                          1 0 ;
+// Send RnW Bit (read or write bit)
+                                                                 > swd                          1 1 ;
+// Send Address Bits (2 bits)
+repeat 2                                                         > swd                          1 0 ;
+// Send Parity Bit
+                                                                 > swd                          1 1 ;
+// Send Stop Bit
+                                                                 > swd                          1 0 ;
+// Send Park Bit
+                                                                 > swd                          1 1 ;
+// Acknowledge Response phase
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// Read Data Payload phase
+// SWD 32-Bit Read Data Start
+repeat 4                                                         > swd                          1 L ;
+                                                                 > swd                          1 H ;
+repeat 27                                                        > swd                          1 L ;
+// SWD 32-Bit Read Data End
+// Get Read Parity Bit
+                                                                 > swd                          1 X ;
+// Send Read ACK bits
+                                                                 > swd                          1 1 ;
+repeat 10                                                        > swd                          1 0 ;
+end_module                                                       > swd                          1 0 ;
+}                                                                                               

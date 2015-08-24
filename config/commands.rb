@@ -24,6 +24,10 @@ when "examples"
   # Pattern generator tests
   ARGV = %w(example -t debug -r approved)
   load "#{Origen.top}/lib/origen/commands/generate.rb"
+  ARGV = %w(example_api -t debug -r approved)
+  load "#{Origen.top}/lib/origen/commands/generate.rb"
+  ARGV = %w(example_reg -t debug -r approved)
+  load "#{Origen.top}/lib/origen/commands/generate.rb"
     
   if Origen.app.stats.changed_files == 0 &&
      Origen.app.stats.new_files == 0 &&

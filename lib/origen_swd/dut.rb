@@ -11,23 +11,31 @@ module OrigenSWD
     include Origen::Pins
 
     # Initializes simple dut model with test register and required swd pins
-    # options - any miscellaneous custom arguments
-    # Returns nothing.
     #
-    # Examples
+    # @param [Hash] options Options to customize the operation
     #
+    # @example
     #   $dut = OrigenSWD::DUT.new
     #
     def initialize(options = {})
-      add_reg :test, 0x0, 32, data: { pos: 0, bits: 32 },
-                              bit:  { pos: 0 }
+      # Sample DPACC register
+      add_reg :test, 0x04, 32, data: { pos: 0, bits: 32 },
+                                bit: { pos: 2 }
+      
+      # Sample DPACC register
+      add_reg :select, 0x08, 32, data: { pos: 0, bits: 32 }
+      
+      # Sample APACC register
+      add_reg :stat, 0x00, 32, data: { pos: 0, bits: 32 }
+      add_reg :control, 0x01, 32, data: { pos: 0, bits: 32 }
+
       add_pin :swd_clk
       add_pin :swd_dio
     end
 
     # Add any custom startup business here.
-    # options - any miscellaneous custom arguments
-    # Returns nothing.
+    #
+    # @param [Hash] options Options to customize the operation
     def startup(options = {})
       $tester.set_timeset('swd', 40)
     end
