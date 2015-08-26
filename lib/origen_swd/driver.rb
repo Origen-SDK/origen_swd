@@ -11,6 +11,8 @@ module OrigenSWD
     # Returns the parent object that instantiated the driver, could be
     # either a DUT object or a protocol abstraction
     attr_reader :owner
+
+    # Customiz-ible 'turn-round cycle' (TRN) parameter (in cycles)
     attr_accessor :trn
 
     # Initialize class variables
@@ -24,7 +26,6 @@ module OrigenSWD
     #
     def initialize(owner, options = {})
       @owner = owner
-      # validate_pins
 
       @current_apaddr = 0
       @orundetect = 0
@@ -295,12 +296,12 @@ module OrigenSWD
       xor
     end
 
-    # Provided shortname access to top-level SWD clock pin
+    # Provides shortname access to top-level SWD clock pin
     def swd_clk
       owner.pin(:swd_clk)
     end
 
-    # Provided shortname access to top-level SWD data I/P pin
+    # Provides shortname access to top-level SWD data I/O pin
     def swd_dio
       owner.pin(:swd_dio)
     end
