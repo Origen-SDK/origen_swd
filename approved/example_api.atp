@@ -1,19 +1,21 @@
 // ***************************************************************************
 // GENERATED:
-//   Time:    23-Aug-2015 22:08PM
-//   By:      Ronnie Lajaunie
+//   Time:    28-Sep-2016 15:34PM
+//   By:      Stephen McGinty
 //   Command: origen g example_api -t debug.rb
 // ***************************************************************************
 // ENVIRONMENT:
 //   Application
 //     Source:    git@github.com:Origen-SDK/origen_swd.git
-//     Version:   0.4.0
-//     Branch:    master(a5d862113ee) (+local edits)
+//     Version:   0.5.0
+//     Branch:    api_cleanup(dacee5f3760) (+local edits)
 //   Origen
 //     Source:    https://github.com/Origen-SDK/origen
-//     Version:   0.2.3
+//     Version:   0.7.31
 //   Plugins
-//     origen_doc_helpers:       0.2.0
+//     atp:                      0.4.3
+//     origen_doc_helpers:       0.4.4
+//     origen_testers:           0.8.4
 // ***************************************************************************
 import tset swd;                                                                                
 svm_only_file = no;                                                                             
@@ -23,28 +25,267 @@ compressed = yes;
 vector ($tset, swd_clk, swd_dio)                                                                
 {                                                                                               
 start_label pattern_st:                                                                         
-// Header phase
-// Send Start Bit
+//                                                                                              s s
+//                                                                                              w w
+//                                                                                              d d
+//                                                                                              - -
+//                                                                                              c d
+//                                                                                              l i
+//                                                                                              k o
+// ######################################################################
+// ## API that is more in line with other Origen plugins
+// ######################################################################
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   0   |   0   |   0   |   0   |   0   |   1   |
                                                                  > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
+repeat 6                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 0 ;
-// Send Address Bits (2 bits)
-repeat 2                                                         > swd                          1 0 ;
-// Send Parity Bit
-                                                                 > swd                          1 0 ;
-// Send Stop Bit
-                                                                 > swd                          1 0 ;
-// Send Park Bit
-                                                                 > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
-// Write Data Payload phase
-// Send ACK Bits
+// [SWD] Write Data Payload
                                                                  > swd                          1 1 ;
-// SWD 32-Bit Write Start
+// [SWD] Data Start
+repeat 4                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+repeat 27                                                        > swd                          1 0 ;
+// [SWD] Data Stop
+                                                                 > swd                          1 1 ;
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   0   |   1   |   0   |   1   |   0   |   1   |
+                                                                 > swd                          1 1 ;
+repeat 2                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// [SWD] Acknowledge Request
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// [SWD] Write Data Payload
+                                                                 > swd                          1 1 ;
+// [SWD] Data Start
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+repeat 25                                                        > swd                          1 0 ;
+// [SWD] Data Stop
+                                                                 > swd                          1 0 ;
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   0   |   0   |   0   |   0   |   0   |   1   |
+                                                                 > swd                          1 1 ;
+repeat 6                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// [SWD] Acknowledge Request
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// [SWD] Write Data Payload
+                                                                 > swd                          1 1 ;
+// [SWD] Data Start
+repeat 4                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+repeat 27                                                        > swd                          1 0 ;
+// [SWD] Data Stop
+                                                                 > swd                          1 1 ;
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   0   |   1   |   0   |   1   |   0   |   1   |
+                                                                 > swd                          1 1 ;
+repeat 2                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// [SWD] Acknowledge Request
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// [SWD] Write Data Payload
+                                                                 > swd                          1 1 ;
+// [SWD] Data Start
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+repeat 25                                                        > swd                          1 0 ;
+// [SWD] Data Stop
+                                                                 > swd                          1 0 ;
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   1   |   0   |   0   |   0   |   1   |   0   |   1   |
+repeat 2                                                         > swd                          1 1 ;
+repeat 3                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// [SWD] Acknowledge Request
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// [SWD] Write Data Payload
+                                                                 > swd                          1 1 ;
+// [SWD] Data Start
+repeat 4                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+repeat 27                                                        > swd                          1 0 ;
+// [SWD] Data Stop
+                                                                 > swd                          1 1 ;
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   1   |   0   |   1   |   0   |   0   |   0   |   1   |
+repeat 2                                                         > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// [SWD] Acknowledge Request
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// [SWD] Write Data Payload
+                                                                 > swd                          1 1 ;
+// [SWD] Data Start
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+repeat 25                                                        > swd                          1 0 ;
+// [SWD] Data Stop
+                                                                 > swd                          1 0 ;
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   1   |   0   |   0   |   1   |   0   |   1   |
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+repeat 2                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// [SWD] Acknowledge Request
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// [SWD] Read Data Payload
+// [SWD] Data Start
+repeat 4                                                         > swd                          1 L ;
+                                                                 > swd                          1 H ;
+repeat 27                                                        > swd                          1 L ;
+// [SWD] Data Stop
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 1 ;
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+repeat 2                                                         > swd                          1 1 ;
+repeat 3                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// [SWD] Acknowledge Request
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// [SWD] Read Data Payload
+// [SWD] Data Start
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 H ;
+repeat 25                                                        > swd                          1 L ;
+// [SWD] Data Stop
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 1 ;
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   1   |   1   |   0   |   0   |   0   |   0   |   1   |
+repeat 3                                                         > swd                          1 1 ;
+repeat 4                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// [SWD] Acknowledge Request
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// [SWD] Read Data Payload
+// [SWD] Data Start
+repeat 4                                                         > swd                          1 L ;
+                                                                 > swd                          1 H ;
+repeat 27                                                        > swd                          1 L ;
+// [SWD] Data Stop
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 1 ;
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   1   |   1   |   1   |   0   |   1   |   0   |   1   |
+repeat 4                                                         > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// [SWD] Acknowledge Request
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// [SWD] Read Data Payload
+// [SWD] Data Start
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 H ;
+repeat 25                                                        > swd                          1 L ;
+// [SWD] Data Stop
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 1 ;
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+repeat 2                                                         > swd                          1 1 ;
+repeat 3                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// [SWD] Acknowledge Request
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// [SWD] Read Data Payload
+// [SWD] Data Start
+repeat 32                                                        > swd                          1 X ;
+// [SWD] Data Stop
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 1 ;
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   1   |   1   |   1   |   0   |   1   |   0   |   1   |
+repeat 4                                                         > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// [SWD] Acknowledge Request
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// [SWD] Read Data Payload
+// [SWD] Data Start
+repeat 32                                                        > swd                          1 X ;
+// [SWD] Data Stop
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 1 ;
+// ######################################################################
+// ## Legacy API
+// ######################################################################
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   1   |   0   |   0   |   0   |   0   |   0   |   1   |
+repeat 2                                                         > swd                          1 1 ;
+repeat 5                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// [SWD] Acknowledge Request
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// [SWD] Write Data Payload
+                                                                 > swd                          1 1 ;
+// [SWD] Data Start
 write_ovl:                                                                                      
 // SWD Data Pin 0:                                                                              
                                                                  > swd                          1 1 ;
@@ -110,91 +351,61 @@ write_ovl:
                                                                  > swd                          1 0 ;
 // SWD Data Pin 31:                                                                             
                                                                  > swd                          1 1 ;
-// Send Write Parity Bit
+// [SWD] Data Stop
                                                                  > swd                          1 0 ;
 // SWD DIO to 0 for 10 cycles
 repeat 10                                                        > swd                          1 0 ;
-// Header phase
-// Send Start Bit
-                                                                 > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
-                                                                 > swd                          1 1 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 1 ;
-// Send Address Bits (2 bits)
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   1   |   1   |   0   |   0   |   1   |   0   |   1   |
+repeat 3                                                         > swd                          1 1 ;
 repeat 2                                                         > swd                          1 0 ;
-// Send Parity Bit
                                                                  > swd                          1 1 ;
-// Send Stop Bit
                                                                  > swd                          1 0 ;
-// Send Park Bit
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
-// Read Data Payload phase
-// SWD 32-Bit Read Data Start
+// [SWD] Read Data Payload
+// [SWD] Data Start
 repeat 32                                                        > swd                          1 X ;
-// SWD 32-Bit Read Data End
-// Get Read Parity Bit
+// [SWD] Data Stop
                                                                  > swd                          1 X ;
-// Send Read ACK bits
                                                                  > swd                          1 1 ;
 repeat 10                                                        > swd                          1 0 ;
-// Header phase
-// Send Start Bit
-                                                                 > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
-                                                                 > swd                          1 1 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 1 ;
-// Send Address Bits (2 bits)
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   1   |   1   |   0   |   0   |   1   |   0   |   1   |
+repeat 3                                                         > swd                          1 1 ;
 repeat 2                                                         > swd                          1 0 ;
-// Send Parity Bit
                                                                  > swd                          1 1 ;
-// Send Stop Bit
                                                                  > swd                          1 0 ;
-// Send Park Bit
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
-// Read Data Payload phase
-// SWD 32-Bit Read Data Start
+// [SWD] Read Data Payload
+// [SWD] Data Start
 repeat 5                                                         > swd                          1 L ;
                                                                  > swd                          1 H ;
 repeat 7                                                         > swd                          1 L ;
                                                                  > swd                          1 H ;
 repeat 18                                                        > swd                          1 L ;
-// SWD 32-Bit Read Data End
-// Get Read Parity Bit
+// [SWD] Data Stop
                                                                  > swd                          1 X ;
-// Send Read ACK bits
                                                                  > swd                          1 1 ;
 repeat 10                                                        > swd                          1 0 ;
-// Header phase
-// Send Start Bit
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   0   |   0   |   1   |   1   |   0   |   1   |
                                                                  > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
-                                                                 > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 0 ;
-// Send Address Bits (2 bits)
+repeat 3                                                         > swd                          1 0 ;
+repeat 2                                                         > swd                          1 1 ;
                                                                  > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// Send Parity Bit
-                                                                 > swd                          1 1 ;
-// Send Stop Bit
-                                                                 > swd                          1 0 ;
-// Send Park Bit
-                                                                 > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
-// Write Data Payload phase
-// Send ACK Bits
+// [SWD] Write Data Payload
                                                                  > swd                          1 1 ;
-// SWD 32-Bit Write Start
+// [SWD] Data Start
 // SWD Data Pin 0:                                                                              
                                                                  > swd                          1 0 ;
 // SWD Data Pin 1:                                                                              
@@ -259,208 +470,148 @@ repeat 3                                                         > swd          
                                                                  > swd                          1 0 ;
 // SWD Data Pin 31:                                                                             
                                                                  > swd                          1 0 ;
-// Send Write Parity Bit
+// [SWD] Data Stop
                                                                  > swd                          1 1 ;
 repeat 10                                                        > swd                          1 0 ;
-// Header phase
-// Send Start Bit
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   1   |   0   |   1   |   0   |   0   |   1   |
                                                                  > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
-                                                                 > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 1 ;
-// Send Address Bits (2 bits)
                                                                  > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// Send Parity Bit
                                                                  > swd                          1 0 ;
-// Send Stop Bit
-                                                                 > swd                          1 0 ;
-// Send Park Bit
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
-                                                                 > swd                          1 1 ;
-repeat 3                                                         > swd                          1 X ;
-// Read Data Payload phase
-// SWD 32-Bit Read Data Start
-repeat 32                                                        > swd                          1 X ;
-// SWD 32-Bit Read Data End
-// Get Read Parity Bit
-                                                                 > swd                          1 X ;
-// Send Read ACK bits
-                                                                 > swd                          1 1 ;
-repeat 10                                                        > swd                          1 0 ;
-// Header phase
-// Send Start Bit
-                                                                 > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
-                                                                 > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 0 ;
-// Send Address Bits (2 bits)
 repeat 2                                                         > swd                          1 0 ;
-// Send Parity Bit
-                                                                 > swd                          1 0 ;
-// Send Stop Bit
-                                                                 > swd                          1 0 ;
-// Send Park Bit
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
-// Write Data Payload phase
-// Send ACK Bits
+// [SWD] Read Data Payload
+// [SWD] Data Start
+repeat 32                                                        > swd                          1 X ;
+// [SWD] Data Stop
+                                                                 > swd                          1 X ;
                                                                  > swd                          1 1 ;
-// SWD 32-Bit Write Start
+repeat 10                                                        > swd                          1 0 ;
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   0   |   0   |   0   |   0   |   0   |   1   |
+                                                                 > swd                          1 1 ;
+repeat 6                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+// [SWD] Acknowledge Request
+                                                                 > swd                          1 1 ;
+repeat 3                                                         > swd                          1 X ;
+// [SWD] Write Data Payload
+                                                                 > swd                          1 1 ;
+// [SWD] Data Start
                                                                  > swd                          1 0 ;
                                                                  > swd                          1 1 ;
 repeat 2                                                         > swd                          1 0 ;
 repeat 2                                                         > swd                          1 1 ;
 repeat 26                                                        > swd                          1 0 ;
-// Send Write Parity Bit
+// [SWD] Data Stop
                                                                  > swd                          1 1 ;
 repeat 10                                                        > swd                          1 0 ;
-// Header phase
-// Send Start Bit
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   0   |   0   |   0   |   0   |   0   |   1   |
                                                                  > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
-                                                                 > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 0 ;
-// Send Address Bits (2 bits)
-repeat 2                                                         > swd                          1 0 ;
-// Send Parity Bit
-                                                                 > swd                          1 0 ;
-// Send Stop Bit
-                                                                 > swd                          1 0 ;
-// Send Park Bit
+repeat 6                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
-// Write Data Payload phase
-// Send ACK Bits
+// [SWD] Write Data Payload
                                                                  > swd                          1 1 ;
-// SWD 32-Bit Write Start
+// [SWD] Data Start
 repeat 4                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
 repeat 27                                                        > swd                          1 0 ;
-// Send Write Parity Bit
+// [SWD] Data Stop
                                                                  > swd                          1 1 ;
 repeat 10                                                        > swd                          1 0 ;
-// Header phase
-// Send Start Bit
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   1   |   0   |   0   |   1   |   0   |   1   |
                                                                  > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
                                                                  > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
                                                                  > swd                          1 1 ;
-// Send Address Bits (2 bits)
 repeat 2                                                         > swd                          1 0 ;
-// Send Parity Bit
                                                                  > swd                          1 1 ;
-// Send Stop Bit
                                                                  > swd                          1 0 ;
-// Send Park Bit
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
-// Read Data Payload phase
-// SWD 32-Bit Read Data Start
+// [SWD] Read Data Payload
+// [SWD] Data Start
 repeat 32                                                        > swd                          1 X ;
-// SWD 32-Bit Read Data End
-// Get Read Parity Bit
+// [SWD] Data Stop
                                                                  > swd                          1 X ;
-// Send Read ACK bits
                                                                  > swd                          1 1 ;
 repeat 10                                                        > swd                          1 0 ;
-// Header phase
-// Send Start Bit
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   1   |   0   |   0   |   1   |   0   |   1   |
                                                                  > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
                                                                  > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
                                                                  > swd                          1 1 ;
-// Send Address Bits (2 bits)
 repeat 2                                                         > swd                          1 0 ;
-// Send Parity Bit
                                                                  > swd                          1 1 ;
-// Send Stop Bit
                                                                  > swd                          1 0 ;
-// Send Park Bit
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
-// Read Data Payload phase
-// SWD 32-Bit Read Data Start
+// [SWD] Read Data Payload
+// [SWD] Data Start
 repeat 4                                                         > swd                          1 L ;
                                                                  > swd                          1 H ;
 repeat 27                                                        > swd                          1 L ;
-// SWD 32-Bit Read Data End
-// Get Read Parity Bit
+// [SWD] Data Stop
                                                                  > swd                          1 X ;
-// Send Read ACK bits
                                                                  > swd                          1 1 ;
 repeat 10                                                        > swd                          1 0 ;
-// Header phase
-// Send Start Bit
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   1   |   0   |   0   |   1   |   0   |   1   |
                                                                  > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
                                                                  > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
                                                                  > swd                          1 1 ;
-// Send Address Bits (2 bits)
 repeat 2                                                         > swd                          1 0 ;
-// Send Parity Bit
                                                                  > swd                          1 1 ;
-// Send Stop Bit
                                                                  > swd                          1 0 ;
-// Send Park Bit
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
-// Read Data Payload phase
-// SWD 32-Bit Read Data Start
+// [SWD] Read Data Payload
+// [SWD] Data Start
 repeat 4                                                         > swd                          1 L ;
                                                                  > swd                          1 H ;
 repeat 27                                                        > swd                          1 L ;
-// SWD 32-Bit Read Data End
-// Get Read Parity Bit
+// [SWD] Data Stop
                                                                  > swd                          1 X ;
-// Send Read ACK bits
                                                                  > swd                          1 1 ;
 repeat 10                                                        > swd                          1 0 ;
-// Header phase
-// Send Start Bit
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   1   |   0   |   0   |   1   |   0   |   1   |
                                                                  > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
                                                                  > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
                                                                  > swd                          1 1 ;
-// Send Address Bits (2 bits)
 repeat 2                                                         > swd                          1 0 ;
-// Send Parity Bit
                                                                  > swd                          1 1 ;
-// Send Stop Bit
                                                                  > swd                          1 0 ;
-// Send Park Bit
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
-// Read Data Payload phase
-// SWD 32-Bit Read Data Start
+// [SWD] Read Data Payload
+// [SWD] Data Start
 repeat 4                                                         > swd                          1 L ;
                                                                  > swd                          1 H ;
 repeat 27                                                        > swd                          1 L ;
-// SWD 32-Bit Read Data End
-// Get Read Parity Bit
+// [SWD] Data Stop
                                                                  > swd                          1 X ;
-// Send Read ACK bits
                                                                  > swd                          1 1 ;
 repeat 10                                                        > swd                          1 0 ;
+// ######################################################################
+// ## Pattern complete
+// ######################################################################
 end_module                                                       > swd                          1 0 ;
 }                                                                                               

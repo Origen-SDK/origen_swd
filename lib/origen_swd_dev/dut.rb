@@ -1,14 +1,12 @@
-module OrigenSWD
+module OrigenSWDDev
   # This is a dummy DUT model which is used
   # to instantiate and test the SWD locally
   # during development.
   #
   # It is not included when this library is imported.
   class DUT
+    include Origen::TopLevel
     include OrigenSWD
-    include Origen::Callbacks
-    include Origen::Registers
-    include Origen::Pins
 
     # Initializes simple dut model with test register and required swd pins
     #

@@ -1,19 +1,21 @@
 // ***************************************************************************
 // GENERATED:
-//   Time:    23-Aug-2015 21:52PM
-//   By:      Ronnie Lajaunie
+//   Time:    28-Sep-2016 15:08PM
+//   By:      Stephen McGinty
 //   Command: origen g example_reg -t debug.rb
 // ***************************************************************************
 // ENVIRONMENT:
 //   Application
 //     Source:    git@github.com:Origen-SDK/origen_swd.git
-//     Version:   0.4.0
-//     Branch:    master(a5d862113ee) (+local edits)
+//     Version:   0.5.0
+//     Branch:    api_cleanup(dacee5f3760) (+local edits)
 //   Origen
 //     Source:    https://github.com/Origen-SDK/origen
-//     Version:   0.2.3
+//     Version:   0.7.31
 //   Plugins
-//     origen_doc_helpers:       0.2.0
+//     atp:                      0.4.3
+//     origen_doc_helpers:       0.4.4
+//     origen_testers:           0.8.4
 // ***************************************************************************
 import tset swd;                                                                                
 svm_only_file = no;                                                                             
@@ -23,126 +25,100 @@ compressed = yes;
 vector ($tset, swd_clk, swd_dio)                                                                
 {                                                                                               
 start_label pattern_st:                                                                         
+//                                                                                              s s
+//                                                                                              w w
+//                                                                                              d d
+//                                                                                              - -
+//                                                                                              c d
+//                                                                                              l i
+//                                                                                              k o
 // ######################################################################
 // ## Test - Write to DR register
 // ######################################################################
-// Header phase
-// Send Start Bit
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   0   |   1   |   0   |   1   |   0   |   1   |
                                                                  > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
-                                                                 > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 0 ;
-// Send Address Bits (2 bits)
+repeat 2                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
-// Send Parity Bit
                                                                  > swd                          1 1 ;
-// Send Stop Bit
                                                                  > swd                          1 0 ;
-// Send Park Bit
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
-// Write Data Payload phase
-// Send ACK Bits
+// [SWD] Write Data Payload
                                                                  > swd                          1 1 ;
-// SWD 32-Bit Write Start
+// [SWD] Data Start
                                                                  > swd                          1 1 ;
 repeat 7                                                         > swd                          1 0 ;
 repeat 9                                                         > swd                          1 1 ;
 repeat 7                                                         > swd                          1 0 ;
 repeat 8                                                         > swd                          1 1 ;
-// Send Write Parity Bit
+// [SWD] Data Stop
                                                                  > swd                          1 0 ;
 // ######################################################################
 // ## Test - Write to DR register with overlay
 // ######################################################################
-// Header phase
-// Send Start Bit
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   0   |   1   |   0   |   1   |   0   |   1   |
                                                                  > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
-                                                                 > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 0 ;
-// Send Address Bits (2 bits)
+repeat 2                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
-// Send Parity Bit
                                                                  > swd                          1 1 ;
-// Send Stop Bit
                                                                  > swd                          1 0 ;
-// Send Park Bit
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
-// Write Data Payload phase
-// Send ACK Bits
+// [SWD] Write Data Payload
                                                                  > swd                          1 1 ;
-// SWD 32-Bit Write Start
+// [SWD] Data Start
                                                                  > swd                          1 1 ;
 repeat 7                                                         > swd                          1 0 ;
 repeat 9                                                         > swd                          1 1 ;
 repeat 7                                                         > swd                          1 0 ;
 repeat 8                                                         > swd                          1 1 ;
-// Send Write Parity Bit
+// [SWD] Data Stop
                                                                  > swd                          1 0 ;
 // ######################################################################
 // ## Test - Write to DR register with single bit overlay
 // ######################################################################
-// Header phase
-// Send Start Bit
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   0   |   1   |   0   |   1   |   0   |   1   |
                                                                  > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
-                                                                 > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 0 ;
-// Send Address Bits (2 bits)
+repeat 2                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
-// Send Parity Bit
                                                                  > swd                          1 1 ;
-// Send Stop Bit
                                                                  > swd                          1 0 ;
-// Send Park Bit
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
-// Write Data Payload phase
-// Send ACK Bits
+// [SWD] Write Data Payload
                                                                  > swd                          1 1 ;
-// SWD 32-Bit Write Start
+// [SWD] Data Start
                                                                  > swd                          1 1 ;
 repeat 7                                                         > swd                          1 0 ;
 repeat 9                                                         > swd                          1 1 ;
 repeat 7                                                         > swd                          1 0 ;
 repeat 8                                                         > swd                          1 1 ;
-// Send Write Parity Bit
+// [SWD] Data Stop
                                                                  > swd                          1 0 ;
 // ######################################################################
 // ## Test - Read full DR register
 // ######################################################################
 // Full register (32 bits)
-// Header phase
-// Send Start Bit
-                                                                 > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
-                                                                 > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 1 ;
-// Send Address Bits (2 bits)
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
-// Send Parity Bit
-                                                                 > swd                          1 0 ;
-// Send Stop Bit
-                                                                 > swd                          1 0 ;
-// Send Park Bit
+repeat 2                                                         > swd                          1 1 ;
+repeat 3                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
 // Read Data Payload phase
@@ -162,23 +138,14 @@ repeat 8                                                         > swd          
 // ######################################################################
 // ## Test - Read single bit out of DR register
 // ######################################################################
-// Header phase
-// Send Start Bit
-                                                                 > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
-                                                                 > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 1 ;
-// Send Address Bits (2 bits)
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
-// Send Parity Bit
-                                                                 > swd                          1 0 ;
-// Send Stop Bit
-                                                                 > swd                          1 0 ;
-// Send Park Bit
+repeat 2                                                         > swd                          1 1 ;
+repeat 3                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
 // Read Data Payload phase
@@ -195,23 +162,14 @@ repeat 30                                                        > swd          
 // ## Test - Store full DR register
 // ######################################################################
 // Full register (32 bits)
-// Header phase
-// Send Start Bit
-                                                                 > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
-                                                                 > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 1 ;
-// Send Address Bits (2 bits)
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
-// Send Parity Bit
-                                                                 > swd                          1 0 ;
-// Send Stop Bit
-                                                                 > swd                          1 0 ;
-// Send Park Bit
+repeat 2                                                         > swd                          1 1 ;
+repeat 3                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
 // Read Data Payload phase
@@ -256,23 +214,14 @@ stv                                                              > swd          
 // ######################################################################
 // ## Test - Store single bit out of DR register
 // ######################################################################
-// Header phase
-// Send Start Bit
-                                                                 > swd                          1 1 ;
-// Send APnDP Bit (DP or AP Access Register Bit)
-                                                                 > swd                          1 0 ;
-// Send RnW Bit (read or write bit)
-                                                                 > swd                          1 1 ;
-// Send Address Bits (2 bits)
+// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+//       |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
-// Send Parity Bit
-                                                                 > swd                          1 0 ;
-// Send Stop Bit
-                                                                 > swd                          1 0 ;
-// Send Park Bit
+repeat 2                                                         > swd                          1 1 ;
+repeat 3                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// Acknowledge Response phase
+// [SWD] Acknowledge Request
                                                                  > swd                          1 1 ;
 repeat 3                                                         > swd                          1 X ;
 // Read Data Payload phase
@@ -285,5 +234,8 @@ repeat 29                                                        > swd          
                                                                  > swd                          1 X ;
 // Send Read ACK bits
                                                                  > swd                          1 1 ;
+// ######################################################################
+// ## Pattern complete
+// ######################################################################
 end_module                                                       > swd                          1 1 ;
 }                                                                                               

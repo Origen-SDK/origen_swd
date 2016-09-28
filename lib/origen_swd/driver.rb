@@ -32,6 +32,30 @@ module OrigenSWD
       @trn = 0
     end
 
+    # Write data from Debug Port
+    #
+    # @param [Integer, Origen::Register::Reg, Origen::Register::BitCollection, Origen::Register::Bit] reg_or_val
+    #   Value to be shifted. If a reg/bit collection is supplied this can be pre-marked for
+    #   read, store or overlay and which will result in the requested action being applied to
+    #   the cycles corresponding to those bits only (don't care cycles will be generated for the others).
+    # @param [Hash] options Options to customize the operation
+    def read_dp(reg_or_val, options = {})
+      reg_or_val, options = nil, reg_or_val if reg_or_val.is_a?(Hash)
+      read(0, reg_or_val, options.merge(compare_data: true))
+    end
+
+    # Write data from Access Port
+    #
+    # @param [Integer, Origen::Register::Reg, Origen::Register::BitCollection, Origen::Register::Bit] reg_or_val
+    #   Value to be shifted. If a reg/bit collection is supplied this can be pre-marked for
+    #   read, store or overlay and which will result in the requested action being applied to
+    #   the cycles corresponding to those bits only (don't care cycles will be generated for the others).
+    # @param [Hash] options Options to customize the operation
+    def read_ap(reg_or_val, options = {})
+      reg_or_val, options = nil, reg_or_val if reg_or_val.is_a?(Hash)
+      read(1, reg_or_val, options.merge(compare_data: true))
+    end
+
     # Read data from Debug Port or Access Port
     #
     # @param [Integer] ap_dp A single bit indicating whether the Debug Port or the Access Port
@@ -42,10 +66,32 @@ module OrigenSWD
     #   the cycles corresponding to those bits only (don't care cycles will be generated for the others).
     # @param [Hash] options Options to customize the operation
     def read(ap_dp, reg_or_val, options = {})
-      addr = reg_or_val.respond_to?(:address) ? reg_or_val.address : reg_or_val
+      addr = extract_address(reg_or_val, options.merge(use_reg_or_val_if_you_must: true))
       send_header(ap_dp, 1, addr)       # send read-specific header (rnw = 1)
       receive_acknowledgement
       receive_payload(reg_or_val, options)
+    end
+
+    # Write data to Debug Port
+    #
+    # @param [Integer, Origen::Register::Reg, Origen::Register::BitCollection, Origen::Register::Bit] reg_or_val
+    #   Value to be shifted. If a reg/bit collection is supplied this can be pre-marked for
+    #   read, store or overlay and which will result in the requested action being applied to
+    #   the cycles corresponding to those bits only (don't care cycles will be generated for the others).
+    # @param [Hash] options Options to customize the operation
+    def write_dp(reg_or_val, options = {})
+      write(0, reg_or_val, options)
+    end
+
+    # Write data to Access Port
+    #
+    # @param [Integer, Origen::Register::Reg, Origen::Register::BitCollection, Origen::Register::Bit] reg_or_val
+    #   Value to be shifted. If a reg/bit collection is supplied this can be pre-marked for
+    #   read, store or overlay and which will result in the requested action being applied to
+    #   the cycles corresponding to those bits only (don't care cycles will be generated for the others).
+    # @param [Hash] options Options to customize the operation
+    def write_ap(reg_or_val, options = {})
+      write(1, reg_or_val, options)
     end
 
     # Write data to Debug Port or Access Port
@@ -56,17 +102,25 @@ module OrigenSWD
     #   Value to be shifted. If a reg/bit collection is supplied this can be pre-marked for
     #   read, store or overlay and which will result in the requested action being applied to
     #   the cycles corresponding to those bits only (don't care cycles will be generated for the others).
-    # @param [Integer] wdata Data to be written
     # @param [Hash] options Options to customize the operation
-    def write(ap_dp, reg_or_val, wdata, options = {})
-      addr = reg_or_val.respond_to?(:address) ? reg_or_val.address : reg_or_val
+    def write(ap_dp, reg_or_val, deprecated_wdata = nil, options = {})
+      deprecated_wdata, options = nil, deprecated_wdata if deprecated_wdata.is_a?(Hash)
+
+      if deprecated_wdata
+        addr = reg_or_val.respond_to?(:address) ? reg_or_val.address : reg_or_val
+      else
+        addr = extract_address(reg_or_val, options)
+      end
+
       send_header(ap_dp, 0, addr)       # send write-specific header (rnw = 0)
       receive_acknowledgement
 
-      if reg_or_val.respond_to?(:data)
-        reg_or_val.data = wdata
-      else
-        reg_or_val = wdata
+      if deprecated_wdata
+        if reg_or_val.respond_to?(:data)
+          reg_or_val.data = deprecated_wdata
+        else
+          reg_or_val = deprecated_wdata
+        end
       end
       send_payload(reg_or_val, options)
     end
@@ -132,6 +186,15 @@ module OrigenSWD
 
     private
 
+    def extract_address(reg_or_val, options)
+      addr = options[:address] || options[:addr]
+      return addr if addr
+      return reg_or_val.address if reg_or_val.respond_to?(:address)
+      return reg_or_val.addr if reg_or_val.respond_to?(:addr)
+      return reg_or_val if reg_or_val && options[:use_reg_or_val_if_you_must]
+      fail 'No address given, if supplying a data value instead of a register object, you must supply an :address option'
+    end
+
     # Send SWD Packet header
     #   ------------------------------------------------------------------------
     #   | Start | APnDP |   1   | ADDR[2] | ADDR[3] | Parity |  Stop  |  Park  |
@@ -146,29 +209,23 @@ module OrigenSWD
       addr = address >> 2
       parity  = apndp ^ rnw ^ (addr >> 3) ^ (addr >> 2) & (0x01) ^ (addr >> 1) & (0x01) ^ addr & 0x01
 
-      cc 'Header phase'
+      cc '[SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |'
+      cc "      |   1   |   #{apndp}   |   #{rnw}   |   #{addr[0]}   |   #{addr[1]}   |   #{parity[0]}   |   0   |   1   |"
       swd_clk.drive(1)
-      cc 'Send Start Bit'
       swd_dio.drive!(1)                                   # send start bit (always 1)
-      cc 'Send APnDP Bit (DP or AP Access Register Bit)'
       swd_dio.drive!(apndp)                               # send apndp bit
-      cc 'Send RnW Bit (read or write bit)'
       swd_dio.drive!(rnw)                                 # send rnw bit
-      cc 'Send Address Bits (2 bits)'
       swd_dio.drive!(addr[0])                             # send address[2] bit
       swd_dio.drive!(addr[1])                             # send address[3] bit
-      cc 'Send Parity Bit'
       swd_dio.drive!(parity[0])                           # send parity bit
-      cc 'Send Stop Bit'
       swd_dio.drive!(0)                                   # send stop bit
-      cc 'Send Park Bit'
       swd_dio.drive!(1)                                   # send park bit
       swd_dio.dont_care
     end
 
     # Waits appropriate number of cycles for the acknowledgement phase
     def receive_acknowledgement
-      cc 'Acknowledge Response phase'
+      cc '[SWD] Acknowledge Request'
       wait_trn
       swd_dio.dont_care
       $tester.cycle(repeat: 3)
@@ -189,17 +246,15 @@ module OrigenSWD
     # @option options [String] :overlay String for pattern label to
     #   facilitate pattern overlay
     def receive_payload(reg_or_val, options)
-      cc 'Read Data Payload phase'
+      cc '[SWD] Read Data Payload'
 
-      cc 'SWD 32-Bit Read Data Start'
+      cc '[SWD] Data Start'
       options[:read] = true
       shift_payload(reg_or_val, options)
 
-      cc 'SWD 32-Bit Read Data End'
-      cc 'Get Read Parity Bit'
+      cc '[SWD] Data Stop'
       swd_dio.dont_care
       $tester.cycle
-      cc 'Send Read ACK bits'
       wait_trn
     end
 
@@ -212,15 +267,14 @@ module OrigenSWD
     # @option options [String] :overlay String for pattern label to
     #   facilitate pattern overlay
     def send_payload(reg_or_val, options)
-      cc 'Write Data Payload phase'
-      cc 'Send ACK Bits'
+      cc '[SWD] Write Data Payload'
       wait_trn
 
-      cc 'SWD 32-Bit Write Start'
+      cc '[SWD] Data Start'
       options[:read] = false
       shift_payload(reg_or_val, options)
 
-      cc 'Send Write Parity Bit'
+      cc '[SWD] Data Stop'
       wdata = reg_or_val.respond_to?(:data) ? reg_or_val.data : reg_or_val
       parity_bit = swd_xor_calc(32, wdata)
       swd_dio.drive!(parity_bit)
@@ -266,7 +320,7 @@ module OrigenSWD
               swd_dio.dont_care
             end
           else
-            if options.key?(:compare_data)
+            if options.key?(:compare_data) && reg_or_val
               swd_dio.assert(reg_or_val[i] ? reg_or_val[i] : 0)
             else
               swd_dio.dont_care

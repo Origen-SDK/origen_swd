@@ -38,8 +38,8 @@ Here is an example integration:
 ~~~ruby
 
 class DUT
+  include Origen::TopLevel
   include OrigenSWD
-  include Origen::Pins 
 
   def initialize(options = {})
     add_pin :swd_clk 
@@ -48,7 +48,29 @@ class DUT
 end
 
 
-DUT.new.swd # => An instance of OrigenSWD::Driver
+dut.swd # => An instance of OrigenSWD::Driver
+
+# Here is the main API for reading and writing the debug and access ports...
+
+# Registers objects can be supplied to provide the address and data values.
+# The register bits can be pre-marked for read, store or overlay and which
+# will result in the requested action being applied to the cycles corresponding
+# to those bits only (don't care cycles will be generated for the others).
+dut.swd.write_dp(reg_object)    
+dut.swd.read_dp(reg_object)    
+dut.swd.write_ap(reg_object)    
+dut.swd.read_ap(reg_object)    
+
+# Alternatively, dumb data values can be supplied.
+dut.swd.write_dp(0x55, address: 10)
+dut.swd.read_dp(0x55, address: 10)    
+dut.swd.write_ap(0x55, address: 10)    
+dut.swd.read_ap(0x55, address: 10)    
+
+# In the case of read, the data value can be omitted completely, in which case
+# it will generate a read operation with don't care on all shift out vectors
+dut.swd.read_dp(address: 10)    
+dut.swd.read_ap(address: 10)    
 ~~~
 
 
@@ -62,7 +84,7 @@ object for use in the console:
 ~~~
 origen i
 
-> $dut.swd
+> dut.swd
 => #<OrigenSWD::Driver:0x0000001ee48e78>
 ~~~
 
