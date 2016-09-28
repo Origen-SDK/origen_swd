@@ -9,4 +9,4 @@
 # You can also perform global configuration here, e.g.  
 # $dut.do_something_before_every_job 
 $dut = OrigenSWD::DUT.new 
-$tester = Origen::Tester::J750.new 
+$tester = OrigenTesters::J750.new 
