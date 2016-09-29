@@ -186,6 +186,74 @@ module OrigenSWD
 
     private
 
+    def extract_data_hex(reg_or_val)
+      if reg_or_val.respond_to?(:data)
+        reg_or_val.data.to_s(16).upcase
+      else
+        reg_or_val.to_s(16).upcase
+      end
+    end
+
+    # Converts a binary-like representation of a data value into a hex-like version.
+    # e.g. input  => 010S0011SSSS0110   (where S, X or V represent store, dont care or overlay)
+    #      output => -010s-3S6    (i.e. nibbles that are not all of the same type are expanded)
+    def extract_read_data_hex(reg_or_val)
+      if reg_or_val.respond_to?(:data)
+        # Make a binary string of the data, like 010S0011SSSS0110
+        # (where S, X or V represent store, dont care or overlay)
+        regval = ''
+        reg_or_val.shift_out_left do |bit|
+          if bit.is_to_be_stored?
+            regval += 'S'
+          elsif bit.is_to_be_read?
+            if bit.has_overlay?
+              regval += 'V'
+            else
+              regval += bit.data.to_s
+            end
+          else
+            regval += 'X'
+          end
+        end
+
+        # Now group by nibbles to give a hex-like representation, and where nibbles
+        # that are not all of the same type are expanded, e.g. -010s-3S6
+        outstr = ''
+        regex = '^'
+        (reg_or_val.size / 4).times { regex += '(....)' }
+        regex += '$'
+        Regexp.new(regex) =~ regval
+
+        nibbles = []
+        (reg_or_val.size / 4).times do |n|                   # now grouped by nibble
+          nibbles << Regexp.last_match[n + 1]
+        end
+
+        nibbles.each_with_index do |nibble, i|
+          # If contains any special chars...
+          if nibble =~ /[XSV]/
+            # If all the same...
+            if nibble[0] == nibble[1] && nibble[1] == nibble[2] && nibble[2] == nibble[3]
+              outstr += nibble[0, 1] # .to_s
+            # Otherwise present this nibble in 'binary' format
+            else
+              outstr += (i == 0 ? '' : '_') + nibble.downcase + (i == 3 ? '' : '_')
+            end
+          # Otherwise if all 1s and 0s...
+          else
+            outstr += '%1X' % nibble.to_i(2)
+          end
+        end
+        outstr
+      else
+        if reg_or_val
+          reg_or_val.to_s(16).upcase
+        else
+          'XXXXXXXX'
+        end
+      end
+    end
+
     def extract_address(reg_or_val, options)
       addr = options[:address] || options[:addr]
       return addr if addr
@@ -209,8 +277,10 @@ module OrigenSWD
       addr = address >> 2
       parity  = apndp ^ rnw ^ (addr >> 3) ^ (addr >> 2) & (0x01) ^ (addr >> 1) & (0x01) ^ addr & 0x01
 
-      cc '[SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |'
-      cc "      |   1   |   #{apndp}   |   #{rnw}   |   #{addr[0]}   |   #{addr[1]}   |   #{parity[0]}   |   0   |   1   |"
+      cc '[SWD] -----------------------------------------------------------------'
+      cc '[SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |'
+      cc "[SWD] |   1   |   #{apndp}   |   #{rnw}   |   #{addr[0]}   |   #{addr[1]}   |   #{parity[0]}   |   0   |   1   |"
+      cc '[SWD] -----------------------------------------------------------------'
       swd_clk.drive(1)
       swd_dio.drive!(1)                                   # send start bit (always 1)
       swd_dio.drive!(apndp)                               # send apndp bit
@@ -225,7 +295,6 @@ module OrigenSWD
 
     # Waits appropriate number of cycles for the acknowledgement phase
     def receive_acknowledgement
-      cc '[SWD] Acknowledge Request'
       wait_trn
       swd_dio.dont_care
       $tester.cycle(repeat: 3)
@@ -246,9 +315,7 @@ module OrigenSWD
     # @option options [String] :overlay String for pattern label to
     #   facilitate pattern overlay
     def receive_payload(reg_or_val, options)
-      cc '[SWD] Read Data Payload'
-
-      cc '[SWD] Data Start'
+      cc "[SWD] Data Start: #{extract_read_data_hex(reg_or_val)}"
       options[:read] = true
       shift_payload(reg_or_val, options)
 
@@ -267,10 +334,9 @@ module OrigenSWD
     # @option options [String] :overlay String for pattern label to
     #   facilitate pattern overlay
     def send_payload(reg_or_val, options)
-      cc '[SWD] Write Data Payload'
       wait_trn
 
-      cc '[SWD] Data Start'
+      cc "[SWD] Data Start: #{extract_data_hex(reg_or_val)}"
       options[:read] = false
       shift_payload(reg_or_val, options)
 
