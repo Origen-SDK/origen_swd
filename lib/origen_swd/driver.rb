@@ -41,7 +41,7 @@ module OrigenSWD
     # @param [Hash] options Options to customize the operation
     def read_dp(reg_or_val, options = {})
       reg_or_val, options = nil, reg_or_val if reg_or_val.is_a?(Hash)
-      read(0, reg_or_val, options.merge(compare_data: true))
+      read(0, reg_or_val, options.merge(compare_data: reg_or_val.is_a?(Numeric)))
     end
 
     # Write data from Access Port
@@ -53,7 +53,7 @@ module OrigenSWD
     # @param [Hash] options Options to customize the operation
     def read_ap(reg_or_val, options = {})
       reg_or_val, options = nil, reg_or_val if reg_or_val.is_a?(Hash)
-      read(1, reg_or_val, options.merge(compare_data: true))
+      read(1, reg_or_val, options.merge(compare_data: reg_or_val.is_a?(Numeric)))
     end
 
     # Read data from Debug Port or Access Port
@@ -70,6 +70,7 @@ module OrigenSWD
       send_header(ap_dp, 1, addr)       # send read-specific header (rnw = 1)
       receive_acknowledgement
       receive_payload(reg_or_val, options)
+      swd_dio.drive(0)
     end
 
     # Write data to Debug Port
@@ -123,65 +124,7 @@ module OrigenSWD
         end
       end
       send_payload(reg_or_val, options)
-    end
-
-    # Sends data stream with SWD protocol
-    #
-    # @param [Integer] data Data to be sent
-    # @param [Integer] size The length of data
-    # @param [Hash] options Options to customize the operation
-    # @option options [String] :overlay String for pattern label to
-    #   facilitate pattern overlay
-    def send_data(data, size, options = {})
-      # Warn caller that this method is being deprecated
-      msg = 'Use swd.write(ap_dp, reg_or_val, wdata, options = {}) instead of send_data(data, size, options = {})'
-      Origen.deprecate msg
-      if options.key?(:overlay)
-        $tester.label(options[:overlay])
-        size.times do |bit|
-          swd_clk.drive(1)
-          $tester.label("// SWD Data Pin #{bit}")
-          swd_dio.drive(data[bit])
-          $tester.cycle
-        end
-        swd_dio.dont_care
-      else
-        size.times do |bit|
-          swd_clk.drive(1)
-          swd_dio.drive(data[bit])
-          $tester.cycle
-        end
-        swd_dio.dont_care
-      end
-    end
-
-    # Recieves data stream with SWD protocol
-    #
-    # @param [Integer] size The length of data
-    # @param [Hash] options Options to customize the operation
-    # @option options [String] :compare_data Data to be compared, only compared
-    #   if options is set
-    def get_data(size, options = {})
-      # Warn caller that this method is being deprecated
-      msg = 'Use swd.read(ap_dp, reg_or_val, options = {}) instead of get_data(size, options = {})'
-      Origen.deprecate msg
-      should_store = swd_dio.is_to_be_stored?
-      swd_dio.dont_care
-      size.times do |bit|
-        $tester.store_next_cycle($dut.pin(:swd_dio)) if should_store
-        swd_dio.assert(options[:compare_data][bit]) if options.key?(:compare_data)
-        $tester.cycle
-      end
-    end
-
-    # Sends specified number of '0' bits
-    #
-    # @param [Integer] size The length of data
-    def swd_dio_to_0(size)
       swd_dio.drive(0)
-      size.times do |bit|
-        $tester.cycle
-      end
     end
 
     private
@@ -296,13 +239,14 @@ module OrigenSWD
     # Waits appropriate number of cycles for the acknowledgement phase
     def receive_acknowledgement
       wait_trn
+      swd_dio.assert!(1)
+      swd_dio.assert!(0)
+      swd_dio.assert!(0)
       swd_dio.dont_care
-      $tester.cycle(repeat: 3)
     end
 
     # Waits for TRN time delay
     def wait_trn
-      swd_dio.drive(1)
       $tester.cycle(repeat: trn + 1)
     end
 
@@ -344,6 +288,7 @@ module OrigenSWD
       wdata = reg_or_val.respond_to?(:data) ? reg_or_val.data : reg_or_val
       parity_bit = swd_xor_calc(32, wdata)
       swd_dio.drive!(parity_bit)
+      swd_dio.dont_care
     end
 
     # Shift the data payload
@@ -380,13 +325,13 @@ module OrigenSWD
               $tester.label(reg_or_val[i].overlay_str)
             elsif reg_or_val[i].is_to_be_read?
               swd_dio.assert(reg_or_val[i] ? reg_or_val[i] : 0)
-            elsif options.key?(:compare_data)
+            elsif options[:compare_data]
               swd_dio.assert(reg_or_val[i] ? reg_or_val[i] : 0)
             else
               swd_dio.dont_care
             end
           else
-            if options.key?(:compare_data) && reg_or_val
+            if options[:compare_data] && reg_or_val
               swd_dio.assert(reg_or_val[i] ? reg_or_val[i] : 0)
             else
               swd_dio.dont_care
