@@ -137,66 +137,6 @@ module OrigenSWD
       end
     end
 
-    # Converts a binary-like representation of a data value into a hex-like version.
-    # e.g. input  => 010S0011SSSS0110   (where S, X or V represent store, dont care or overlay)
-    #      output => -010s-3S6    (i.e. nibbles that are not all of the same type are expanded)
-    def extract_read_data_hex(reg_or_val)
-      if reg_or_val.respond_to?(:data)
-        # Make a binary string of the data, like 010S0011SSSS0110
-        # (where S, X or V represent store, dont care or overlay)
-        regval = ''
-        reg_or_val.shift_out_left do |bit|
-          if bit.is_to_be_stored?
-            regval += 'S'
-          elsif bit.is_to_be_read?
-            if bit.has_overlay?
-              regval += 'V'
-            else
-              regval += bit.data.to_s
-            end
-          else
-            regval += 'X'
-          end
-        end
-
-        # Now group by nibbles to give a hex-like representation, and where nibbles
-        # that are not all of the same type are expanded, e.g. -010s-3S6
-        outstr = ''
-        regex = '^'
-        (reg_or_val.size / 4).times { regex += '(....)' }
-        regex += '$'
-        Regexp.new(regex) =~ regval
-
-        nibbles = []
-        (reg_or_val.size / 4).times do |n|                   # now grouped by nibble
-          nibbles << Regexp.last_match[n + 1]
-        end
-
-        nibbles.each_with_index do |nibble, i|
-          # If contains any special chars...
-          if nibble =~ /[XSV]/
-            # If all the same...
-            if nibble[0] == nibble[1] && nibble[1] == nibble[2] && nibble[2] == nibble[3]
-              outstr += nibble[0, 1] # .to_s
-            # Otherwise present this nibble in 'binary' format
-            else
-              outstr += (i == 0 ? '' : '_') + nibble.downcase + (i == 3 ? '' : '_')
-            end
-          # Otherwise if all 1s and 0s...
-          else
-            outstr += '%1X' % nibble.to_i(2)
-          end
-        end
-        outstr
-      else
-        if reg_or_val
-          reg_or_val.to_s(16).upcase
-        else
-          'XXXXXXXX'
-        end
-      end
-    end
-
     def extract_address(reg_or_val, options)
       addr = options[:address] || options[:addr]
       return addr if addr
@@ -250,6 +190,14 @@ module OrigenSWD
       $tester.cycle(repeat: trn + 1)
     end
 
+    def log(msg)
+      cc "[SWD] #{msg}"
+      if block_given?
+        yield
+        cc "[SWD] /#{msg}"
+      end
+    end
+
     # Get (read) the data payload
     #
     # @param [Integer, Origen::Register::Reg, Origen::Register::BitCollection, Origen::Register::Bit] reg_or_val
@@ -259,11 +207,10 @@ module OrigenSWD
     # @option options [String] :overlay String for pattern label to
     #   facilitate pattern overlay
     def receive_payload(reg_or_val, options)
-      cc "[SWD] Data Start: #{extract_read_data_hex(reg_or_val)}"
-      options[:read] = true
-      shift_payload(reg_or_val, options)
-
-      cc '[SWD] Data Stop'
+      log "Read: #{Origen::Utility.read_hex(reg_or_val)}" do
+        options[:read] = true
+        shift_payload(reg_or_val, options)
+      end
       swd_dio.dont_care
       $tester.cycle
       wait_trn
@@ -279,13 +226,13 @@ module OrigenSWD
     #   facilitate pattern overlay
     def send_payload(reg_or_val, options)
       wait_trn
-
-      cc "[SWD] Data Start: #{extract_data_hex(reg_or_val)}"
-      options[:read] = false
-      shift_payload(reg_or_val, options)
-
-      cc '[SWD] Data Stop'
       wdata = reg_or_val.respond_to?(:data) ? reg_or_val.data : reg_or_val
+
+      log "Write: #{wdata.to_hex}" do
+        options[:read] = false
+        shift_payload(reg_or_val, options)
+      end
+
       parity_bit = swd_xor_calc(32, wdata)
       swd_dio.drive!(parity_bit)
       swd_dio.dont_care

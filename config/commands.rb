@@ -22,8 +22,6 @@ when "examples"
   status = 0
   
   # Pattern generator tests
-  ARGV = %w(example -t debug -r approved)
-  load "#{Origen.top}/lib/origen/commands/generate.rb"
   ARGV = %w(example_api -t debug -r approved)
   load "#{Origen.top}/lib/origen/commands/generate.rb"
   ARGV = %w(example_reg -t debug -r approved)

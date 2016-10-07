@@ -1,6 +1,6 @@
 // ***************************************************************************
 // GENERATED:
-//   Time:    28-Sep-2016 15:08PM
+//   Time:    07-Oct-2016 17:33PM
 //   By:      Stephen McGinty
 //   Command: origen g example_reg -t debug.rb
 // ***************************************************************************
@@ -8,14 +8,14 @@
 //   Application
 //     Source:    git@github.com:Origen-SDK/origen_swd.git
 //     Version:   0.5.0
-//     Branch:    api_cleanup(dacee5f3760) (+local edits)
+//     Branch:    api_cleanup(deb33386013) (+local edits)
 //   Origen
 //     Source:    https://github.com/Origen-SDK/origen
-//     Version:   0.7.31
+//     Version:   0.7.36
 //   Plugins
 //     atp:                      0.4.3
 //     origen_doc_helpers:       0.4.4
-//     origen_testers:           0.8.4
+//     origen_testers:           0.8.5
 // ***************************************************************************
 import tset swd;                                                                                
 svm_only_file = no;                                                                             
@@ -35,8 +35,10 @@ start_label pattern_st:
 // ######################################################################
 // ## Test - Write to DR register
 // ######################################################################
-// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
-//       |   1   |   0   |   0   |   1   |   0   |   1   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
+// [SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+// [SWD] |   1   |   0   |   0   |   1   |   0   |   1   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
                                                                  > swd                          1 1 ;
 repeat 2                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
@@ -44,24 +46,25 @@ repeat 2                                                         > swd          
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// [SWD] Acknowledge Request
-                                                                 > swd                          1 1 ;
-repeat 3                                                         > swd                          1 X ;
-// [SWD] Write Data Payload
-                                                                 > swd                          1 1 ;
-// [SWD] Data Start
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 H ;
+repeat 2                                                         > swd                          1 L ;
+                                                                 > swd                          1 X ;
+// [SWD] Write: 0xFF01FF01
                                                                  > swd                          1 1 ;
 repeat 7                                                         > swd                          1 0 ;
 repeat 9                                                         > swd                          1 1 ;
 repeat 7                                                         > swd                          1 0 ;
 repeat 8                                                         > swd                          1 1 ;
-// [SWD] Data Stop
+// [SWD] /Write: 0xFF01FF01
                                                                  > swd                          1 0 ;
 // ######################################################################
 // ## Test - Write to DR register with overlay
 // ######################################################################
-// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
-//       |   1   |   0   |   0   |   1   |   0   |   1   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
+// [SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+// [SWD] |   1   |   0   |   0   |   1   |   0   |   1   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
                                                                  > swd                          1 1 ;
 repeat 2                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
@@ -69,24 +72,25 @@ repeat 2                                                         > swd          
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// [SWD] Acknowledge Request
-                                                                 > swd                          1 1 ;
-repeat 3                                                         > swd                          1 X ;
-// [SWD] Write Data Payload
-                                                                 > swd                          1 1 ;
-// [SWD] Data Start
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 H ;
+repeat 2                                                         > swd                          1 L ;
+                                                                 > swd                          1 X ;
+// [SWD] Write: 0xFF01FF01
                                                                  > swd                          1 1 ;
 repeat 7                                                         > swd                          1 0 ;
 repeat 9                                                         > swd                          1 1 ;
 repeat 7                                                         > swd                          1 0 ;
 repeat 8                                                         > swd                          1 1 ;
-// [SWD] Data Stop
+// [SWD] /Write: 0xFF01FF01
                                                                  > swd                          1 0 ;
 // ######################################################################
 // ## Test - Write to DR register with single bit overlay
 // ######################################################################
-// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
-//       |   1   |   0   |   0   |   1   |   0   |   1   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
+// [SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+// [SWD] |   1   |   0   |   0   |   1   |   0   |   1   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
                                                                  > swd                          1 1 ;
 repeat 2                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
@@ -94,35 +98,35 @@ repeat 2                                                         > swd          
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// [SWD] Acknowledge Request
-                                                                 > swd                          1 1 ;
-repeat 3                                                         > swd                          1 X ;
-// [SWD] Write Data Payload
-                                                                 > swd                          1 1 ;
-// [SWD] Data Start
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 H ;
+repeat 2                                                         > swd                          1 L ;
+                                                                 > swd                          1 X ;
+// [SWD] Write: 0xFF01FF01
                                                                  > swd                          1 1 ;
 repeat 7                                                         > swd                          1 0 ;
 repeat 9                                                         > swd                          1 1 ;
 repeat 7                                                         > swd                          1 0 ;
 repeat 8                                                         > swd                          1 1 ;
-// [SWD] Data Stop
+// [SWD] /Write: 0xFF01FF01
                                                                  > swd                          1 0 ;
 // ######################################################################
 // ## Test - Read full DR register
 // ######################################################################
 // Full register (32 bits)
-// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
-//       |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
+// [SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+// [SWD] |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
 repeat 2                                                         > swd                          1 1 ;
 repeat 3                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// [SWD] Acknowledge Request
-                                                                 > swd                          1 1 ;
-repeat 3                                                         > swd                          1 X ;
-// Read Data Payload phase
-// SWD 32-Bit Read Data Start
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 H ;
+repeat 2                                                         > swd                          1 L ;
+// [SWD] Read: 0xFF01FF0_0v01
                                                                  > swd                          1 H ;
                                                                  > swd                          1 L ;
 write_overlay:                                                                                  
@@ -130,112 +134,103 @@ repeat 6                                                         > swd          
 repeat 9                                                         > swd                          1 H ;
 repeat 7                                                         > swd                          1 L ;
 repeat 8                                                         > swd                          1 H ;
-// SWD 32-Bit Read Data End
-// Get Read Parity Bit
-                                                                 > swd                          1 X ;
-// Send Read ACK bits
-                                                                 > swd                          1 1 ;
+// [SWD] /Read: 0xFF01FF0_0v01
+repeat 2                                                         > swd                          1 X ;
 // ######################################################################
 // ## Test - Read single bit out of DR register
 // ######################################################################
-// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
-//       |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
+// [SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+// [SWD] |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
 repeat 2                                                         > swd                          1 1 ;
 repeat 3                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// [SWD] Acknowledge Request
-                                                                 > swd                          1 1 ;
-repeat 3                                                         > swd                          1 X ;
-// Read Data Payload phase
-// SWD 32-Bit Read Data Start
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 H ;
+repeat 2                                                         > swd                          1 L ;
+// [SWD] Read: 0xXXXXXXX_xvxx
 repeat 2                                                         > swd                          1 X ;
 write_overlay:                                                                                  
 repeat 30                                                        > swd                          1 X ;
-// SWD 32-Bit Read Data End
-// Get Read Parity Bit
-                                                                 > swd                          1 X ;
-// Send Read ACK bits
-                                                                 > swd                          1 1 ;
+// [SWD] /Read: 0xXXXXXXX_xvxx
+repeat 2                                                         > swd                          1 X ;
 // ######################################################################
 // ## Test - Store full DR register
 // ######################################################################
 // Full register (32 bits)
-// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
-//       |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
+// [SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+// [SWD] |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
 repeat 2                                                         > swd                          1 1 ;
 repeat 3                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// [SWD] Acknowledge Request
-                                                                 > swd                          1 1 ;
-repeat 3                                                         > swd                          1 X ;
-// Read Data Payload phase
-// SWD 32-Bit Read Data Start
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-stv                                                              > swd                          1 X ;
-// SWD 32-Bit Read Data End
-// Get Read Parity Bit
                                                                  > swd                          1 X ;
-// Send Read ACK bits
-                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 H ;
+repeat 2                                                         > swd                          1 L ;
+// [SWD] Read: 0xSSSSSSSS
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+stv                                                              > swd                          1 X ;
+// [SWD] /Read: 0xSSSSSSSS
+repeat 2                                                         > swd                          1 X ;
 // ######################################################################
 // ## Test - Store single bit out of DR register
 // ######################################################################
-// [SWD] | Start | APnDP | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
-//       |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
+// [SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+// [SWD] |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
                                                                  > swd                          1 1 ;
                                                                  > swd                          1 0 ;
 repeat 2                                                         > swd                          1 1 ;
 repeat 3                                                         > swd                          1 0 ;
                                                                  > swd                          1 1 ;
-// [SWD] Acknowledge Request
-                                                                 > swd                          1 1 ;
-repeat 3                                                         > swd                          1 X ;
-// Read Data Payload phase
-// SWD 32-Bit Read Data Start
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 H ;
+repeat 2                                                         > swd                          1 L ;
+// [SWD] Read: 0xXXXXXXX_xsxx
 repeat 2                                                         > swd                          1 X ;
 stv                                                              > swd                          1 X ;
 repeat 29                                                        > swd                          1 X ;
-// SWD 32-Bit Read Data End
-// Get Read Parity Bit
-                                                                 > swd                          1 X ;
-// Send Read ACK bits
-                                                                 > swd                          1 1 ;
+// [SWD] /Read: 0xXXXXXXX_xsxx
+repeat 2                                                         > swd                          1 X ;
 // ######################################################################
 // ## Pattern complete
 // ######################################################################
-end_module                                                       > swd                          1 1 ;
+end_module                                                       > swd                          1 0 ;
 }                                                                                               
