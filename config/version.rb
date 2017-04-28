@@ -1,6 +1,6 @@
 module OrigenSWD
-  MAJOR = 0
-  MINOR = 5
+  MAJOR = 1
+  MINOR = 0
   BUGFIX = 0
   DEV = nil
 

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    origen_swd (0.5.0)
+    origen_swd (1.0.0)
       origen (>= 0.7.36)
 
 GEM
@@ -157,3 +157,6 @@ DEPENDENCIES
   origen_doc_helpers
   origen_swd!
   origen_testers
+
+BUNDLED WITH
+   1.13.6
