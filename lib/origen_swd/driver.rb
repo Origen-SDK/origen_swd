@@ -327,8 +327,7 @@ module OrigenSWD
       else
         reg = Reg.dummy(32)
         if reg_or_val.nil?
-          reg.write(0)
-          reg.write(options[:compare_data]) if options[:compare_data]
+          reg.read(options[:compare_data]) if options[:compare_data]
         else
           reg.write(reg_or_val)
           reg.read if options[:read]
