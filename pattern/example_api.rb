@@ -15,7 +15,7 @@ Pattern.create do
   dut.swd.read_dp(0x55, address: 4)
   dut.swd.read_ap(dut.control)
   dut.swd.read_ap(0x55, address: 4)
-  dut.swd.read_dp(address: 4)
-  dut.swd.read_ap(address: 4)
+  #dut.swd.read_dp(address: 4)
+  #dut.swd.read_ap(address: 4)
 
 end

@@ -247,49 +247,51 @@ module OrigenSWD
     # @option options [String] :overlay String for pattern label to
     #   facilitate pattern overlay
     def shift_payload(reg_or_val, options)
-      cc options[:arm_debug_comment] if options.key?(:arm_debug_comment)
+      options = { no_subr: false }.merge(options)
+
+      reg = to_reg(reg_or_val, options)
       size = 32    # SWD only used to write to DP and AP registers of ARM Debugger (32 bits)
-      contains_bits = (contains_bits?(reg_or_val) || is_a_bit?(reg_or_val))
-      if options.key?(:arm_debug_overlay)
-        options[:overlay] = options[:arm_debug_overlay]
-        options[:overlay_label] = options[:arm_debug_overlay]
+
+      # tester does not support direct labels, so can't do
+      if options[:no_subr] && !$tester.respond_to?('label')
+        cc 'This tester does not support use of labels, cannot do no_subr option as requested'
+        cc '  going with subroutine overlay instead'
+        options[:no_subr] = false
       end
-      if options.key?(:overlay)
-        if options[:overlay_label].nil?
-          options[:overlay_label] = options[:overlay]
-          $tester.label(options[:overlay_label]) if options.key?(:overlay)
-        end
-      end
+
+      cc options[:arm_debug_comment] if options.key?(:arm_debug_comment)
       swd_clk.drive(1)
-      size.times do |i|
-        if options[:read]
-          # If it's a register support bit-wise reads
-          if contains_bits
-            if reg_or_val[i].is_to_be_stored?
+
+      reg_overlay = extract_reg_overlay(reg)
+      if reg_overlay && !options[:no_subr] && !Origen.mode.simulation?
+        Origen.tester.call_subroutine(reg[0].overlay_str)
+      else
+        last_overlay_label = ''
+        size.times do |i|
+          swd_dio.dont_care
+          if options[:read]
+            if reg[i].is_to_be_stored?
               Origen.tester.store_next_cycle(swd_dio)
               swd_dio.dont_care if Origen.tester.j750?
-            elsif reg_or_val[i].has_overlay?
-              $tester.label(reg_or_val[i].overlay_str)
-            elsif reg_or_val[i].is_to_be_read?
-              swd_dio.assert(reg_or_val[i] ? reg_or_val[i] : 0)
-            elsif options[:compare_data]
-              swd_dio.assert(reg_or_val[i] ? reg_or_val[i] : 0)
-            else
-              swd_dio.dont_care
+            elsif reg[i].is_to_be_read?
+              swd_dio.assert(reg[i] ? reg[i] : 0)
             end
           else
-            if options[:compare_data] && reg_or_val
-              swd_dio.assert(reg_or_val[i] ? reg_or_val[i] : 0)
-            else
-              swd_dio.dont_care
-            end
+            swd_dio.drive(reg_or_val[i])
           end
-          $tester.cycle
-        else
-          $tester.label("// SWD Data Pin #{i}") if options.key?(:overlay) && !Origen.mode.simulation?
-          swd_dio.drive!(reg_or_val[i])
+
+          if reg[i].has_overlay? && !Origen.mode.simulation? && tester.respond_to?('label')
+            if reg[i].overlay_str != last_overlay_label
+              Origen.tester.label(reg[i].overlay_str)
+              last_overlay_label = reg[i].overlay_str
+            end
+            tester.cycle dont_compress: true
+          else
+            tester.cycle
+          end
         end
       end
+
       # Clear read and similar flags to reflect that the request has just
       # been fulfilled
       reg_or_val.clear_flags if reg_or_val.respond_to?(:clear_flags)
@@ -316,6 +318,30 @@ module OrigenSWD
     # Provides shortname access to top-level SWD data I/O pin
     def swd_dio
       owner.pin(:swd_dio)
+    end
+
+    # Converts reg_or_val to reg
+    def to_reg(reg_or_val, options)
+      if reg_or_val.respond_to?(:data)
+        reg = reg_or_val.dup
+      else
+        reg = Reg.dummy(32)
+        reg.write(reg_or_val)
+        reg.read if options[:read]
+      end
+      reg.overlay(options[:arm_debug_overlay]) if options.key?(:arm_debug_overlay)
+      reg.overlay(options[:overlay_label]) if options.key?(:overlay)
+      reg
+    end
+
+    # Return overlay sting if same for all bits, otherwise return nil
+    def extract_reg_overlay(reg)
+      ovl = reg[0].overlay_str
+      reg.size.times do |i|
+        return nil unless reg[i].has_overlay?
+        return nil if ovl != reg[i].overlay_str || ovl.nil?
+      end
+      ovl
     end
   end
 end

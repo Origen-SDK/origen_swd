@@ -1,14 +1,14 @@
 // ***************************************************************************
 // GENERATED:
-//   Time:    07-Oct-2016 17:33PM
-//   By:      Stephen McGinty
+//   Time:    01-May-2017 15:41PM
+//   By:      Lajaunie Ronald-B01784
 //   Command: origen g example_api -t debug.rb
 // ***************************************************************************
 // ENVIRONMENT:
 //   Application
 //     Source:    git@github.com:Origen-SDK/origen_swd.git
-//     Version:   0.5.0
-//     Branch:    api_cleanup(deb33386013) (+local edits)
+//     Version:   1.0.0
+//     Branch:    overlays(cc216982455) (+local edits)
 //   Origen
 //     Source:    https://github.com/Origen-SDK/origen
 //     Version:   0.7.36
@@ -238,38 +238,6 @@ repeat 2                                                         > swd          
                                                                  > swd                          1 H ;
 repeat 25                                                        > swd                          1 L ;
 // [SWD] /Read: 0x55
-repeat 2                                                         > swd                          1 X ;
-// [SWD] -----------------------------------------------------------------
-// [SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
-// [SWD] |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
-// [SWD] -----------------------------------------------------------------
-                                                                 > swd                          1 1 ;
-                                                                 > swd                          1 0 ;
-repeat 2                                                         > swd                          1 1 ;
-repeat 3                                                         > swd                          1 0 ;
-                                                                 > swd                          1 1 ;
-                                                                 > swd                          1 X ;
-                                                                 > swd                          1 H ;
-repeat 2                                                         > swd                          1 L ;
-// [SWD] Read: 0xX
-repeat 32                                                        > swd                          1 X ;
-// [SWD] /Read: 0xX
-repeat 2                                                         > swd                          1 X ;
-// [SWD] -----------------------------------------------------------------
-// [SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
-// [SWD] |   1   |   1   |   1   |   1   |   0   |   1   |   0   |   1   |
-// [SWD] -----------------------------------------------------------------
-repeat 4                                                         > swd                          1 1 ;
-                                                                 > swd                          1 0 ;
-                                                                 > swd                          1 1 ;
-                                                                 > swd                          1 0 ;
-                                                                 > swd                          1 1 ;
-                                                                 > swd                          1 X ;
-                                                                 > swd                          1 H ;
-repeat 2                                                         > swd                          1 L ;
-// [SWD] Read: 0xX
-repeat 32                                                        > swd                          1 X ;
-// [SWD] /Read: 0xX
 repeat 2                                                         > swd                          1 X ;
 // ######################################################################
 // ## Pattern complete
