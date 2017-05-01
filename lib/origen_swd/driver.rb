@@ -326,8 +326,13 @@ module OrigenSWD
         reg = reg_or_val.dup
       else
         reg = Reg.dummy(32)
-        reg.write(reg_or_val)
-        reg.read if options[:read]
+        if reg_or_val.nil?
+          reg.write(0)
+          reg.write(options[:compare_data]) if options[:compare_data]
+        else
+          reg.write(reg_or_val)
+          reg.read if options[:read]
+        end
       end
       reg.overlay(options[:arm_debug_overlay]) if options.key?(:arm_debug_overlay)
       reg.overlay(options[:overlay_label]) if options.key?(:overlay)
