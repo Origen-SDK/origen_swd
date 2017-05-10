@@ -1,14 +1,14 @@
 // ***************************************************************************
 // GENERATED:
-//   Time:    07-Oct-2016 17:33PM
-//   By:      Stephen McGinty
+//   Time:    01-May-2017 15:41PM
+//   By:      Lajaunie Ronald-B01784
 //   Command: origen g example_reg -t debug.rb
 // ***************************************************************************
 // ENVIRONMENT:
 //   Application
 //     Source:    git@github.com:Origen-SDK/origen_swd.git
-//     Version:   0.5.0
-//     Branch:    api_cleanup(deb33386013) (+local edits)
+//     Version:   1.0.0
+//     Branch:    overlays(cc216982455) (+local edits)
 //   Origen
 //     Source:    https://github.com/Origen-SDK/origen
 //     Version:   0.7.36
@@ -18,6 +18,8 @@
 //     origen_testers:           0.8.5
 // ***************************************************************************
 import tset swd;                                                                                
+import svm_subr write_overlay_subr;                                                             
+import svm_subr read_overlay_subr;                                                              
 svm_only_file = no;                                                                             
 opcode_mode = extended;                                                                         
 compressed = yes;                                                                               
@@ -59,7 +61,7 @@ repeat 8                                                         > swd          
 // [SWD] /Write: 0xFF01FF01
                                                                  > swd                          1 0 ;
 // ######################################################################
-// ## Test - Write to DR register with overlay
+// ## Test - Write to DR register with overlay, no subroutine
 // ######################################################################
 // [SWD] -----------------------------------------------------------------
 // [SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
@@ -77,11 +79,60 @@ repeat 2                                                         > swd          
 repeat 2                                                         > swd                          1 L ;
                                                                  > swd                          1 X ;
 // [SWD] Write: 0xFF01FF01
+write_overlay:                                                                                  
                                                                  > swd                          1 1 ;
-repeat 7                                                         > swd                          1 0 ;
-repeat 9                                                         > swd                          1 1 ;
-repeat 7                                                         > swd                          1 0 ;
-repeat 8                                                         > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 1 ;
+// [SWD] /Write: 0xFF01FF01
+                                                                 > swd                          1 0 ;
+// ######################################################################
+// ## Test - Write to DR register with overlay, use subroutine if available
+// ######################################################################
+// [SWD] -----------------------------------------------------------------
+// [SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+// [SWD] |   1   |   0   |   0   |   1   |   0   |   1   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
+                                                                 > swd                          1 1 ;
+repeat 2                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 H ;
+repeat 2                                                         > swd                          1 L ;
+call write_overlay_subr                                          > swd                          1 X ;
+// [SWD] Write: 0xFF01FF01
 // [SWD] /Write: 0xFF01FF01
                                                                  > swd                          1 0 ;
 // ######################################################################
@@ -104,7 +155,10 @@ repeat 2                                                         > swd          
                                                                  > swd                          1 X ;
 // [SWD] Write: 0xFF01FF01
                                                                  > swd                          1 1 ;
-repeat 7                                                         > swd                          1 0 ;
+                                                                 > swd                          1 0 ;
+bit_write_overlay:                                                                              
+                                                                 > swd                          1 0 ;
+repeat 5                                                         > swd                          1 0 ;
 repeat 9                                                         > swd                          1 1 ;
 repeat 7                                                         > swd                          1 0 ;
 repeat 8                                                         > swd                          1 1 ;
@@ -126,15 +180,83 @@ repeat 3                                                         > swd          
                                                                  > swd                          1 X ;
                                                                  > swd                          1 H ;
 repeat 2                                                         > swd                          1 L ;
-// [SWD] Read: 0xFF01FF0_0v01
+// [SWD] Read: 0xFF01FF01
                                                                  > swd                          1 H ;
-                                                                 > swd                          1 L ;
-write_overlay:                                                                                  
-repeat 6                                                         > swd                          1 L ;
+repeat 7                                                         > swd                          1 L ;
 repeat 9                                                         > swd                          1 H ;
 repeat 7                                                         > swd                          1 L ;
 repeat 8                                                         > swd                          1 H ;
-// [SWD] /Read: 0xFF01FF0_0v01
+// [SWD] /Read: 0xFF01FF01
+repeat 2                                                         > swd                          1 X ;
+// ######################################################################
+// ## Test - Full register (32 bits) read with overlay, no subroutine
+// ######################################################################
+// [SWD] -----------------------------------------------------------------
+// [SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+// [SWD] |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+repeat 2                                                         > swd                          1 1 ;
+repeat 3                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 H ;
+repeat 2                                                         > swd                          1 L ;
+// [SWD] Read: 0xVVVVVVVV
+read_overlay:                                                                                   
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 L ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 H ;
+// [SWD] /Read: 0xVVVVVVVV
+repeat 2                                                         > swd                          1 X ;
+// ######################################################################
+// ## Test - Full register (32 bits) read with overlay, use subroutine if available
+// ######################################################################
+// [SWD] -----------------------------------------------------------------
+// [SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |
+// [SWD] |   1   |   0   |   1   |   1   |   0   |   0   |   0   |   1   |
+// [SWD] -----------------------------------------------------------------
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 0 ;
+repeat 2                                                         > swd                          1 1 ;
+repeat 3                                                         > swd                          1 0 ;
+                                                                 > swd                          1 1 ;
+                                                                 > swd                          1 X ;
+                                                                 > swd                          1 H ;
+                                                                 > swd                          1 L ;
+call read_overlay_subr                                           > swd                          1 L ;
+// [SWD] Read: 0xVVVVVVVV
+// [SWD] /Read: 0xVVVVVVVV
 repeat 2                                                         > swd                          1 X ;
 // ######################################################################
 // ## Test - Read single bit out of DR register
@@ -151,11 +273,11 @@ repeat 3                                                         > swd          
                                                                  > swd                          1 X ;
                                                                  > swd                          1 H ;
 repeat 2                                                         > swd                          1 L ;
-// [SWD] Read: 0xXXXXXXX_xvxx
+// [SWD] Read: 0xXXXXXXX_x0xx
 repeat 2                                                         > swd                          1 X ;
-write_overlay:                                                                                  
-repeat 30                                                        > swd                          1 X ;
-// [SWD] /Read: 0xXXXXXXX_xvxx
+                                                                 > swd                          1 L ;
+repeat 29                                                        > swd                          1 X ;
+// [SWD] /Read: 0xXXXXXXX_x0xx
 repeat 2                                                         > swd                          1 X ;
 // ######################################################################
 // ## Test - Store full DR register
