@@ -274,7 +274,7 @@ module OrigenSWD
               Origen.tester.store_next_cycle(swd_dio)
               swd_dio.dont_care if Origen.tester.j750?
             elsif reg[i].is_to_be_read?
-              swd_dio.assert(reg[i] ? reg[i] : 0)
+              swd_dio.assert(reg[i] ? reg[i] : 0, meta: { position: i })
             end
           else
             swd_dio.drive(reg_or_val[i])
