@@ -184,20 +184,23 @@ module OrigenSWD
     #   transaction, verifies that a transaction error occurred.
     # @note If both :ignore_acknowledgement and :expect_transaction_error are present,
     #   :ignore_acknowledgement will take precedence.
-    def receive_acknowledgement(options = {})
+    def receive_acknowledgement(confirm: :success, **options)
       wait_trn
-      if options[:ignore_acknowledgement]
+      if [:ignore, :none, :skip].include?(confirm)
         log('Ignoring Acknowledgement Phase')
-        tester.cycle(3)
-      elsif options[:expect_transaction_error]
-        log('Expecting Error During Acknowledgement Phase')
+        tester.cycle(repeat: 3)
+      elsif [:failure, :fail, :error].include?(confirm)
+        log('Confirming Error Encountered During Acknowledgement Phase')
         swd_dio.assert!(0)
         swd_dio.assert!(0)
         swd_dio.assert!(1)
+      elsif confirm == :success
+        log('Confirming Success During Acknowledgement Phase')
+        swd_dio.assert!(1)
+        swd_dio.assert!(0)
+        swd_dio.assert!(0)
       else
-        swd_dio.assert!(1)
-        swd_dio.assert!(0)
-        swd_dio.assert!(0)
+        Origen.app!.fail!(message: "OrigenSWD: Origen SWD does not know how to confirm :#{confirm}")
       end
       swd_dio.dont_care
     end
