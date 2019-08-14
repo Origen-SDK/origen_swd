@@ -68,7 +68,7 @@ module OrigenSWD
     def read(ap_dp, reg_or_val, options = {})
       addr = extract_address(reg_or_val, options.merge(use_reg_or_val_if_you_must: true))
       send_header(ap_dp, 1, addr)       # send read-specific header (rnw = 1)
-      receive_acknowledgement
+      receive_acknowledgement(options)
       receive_payload(reg_or_val, options)
       swd_dio.drive(0)
     end
@@ -177,11 +177,31 @@ module OrigenSWD
     end
 
     # Waits appropriate number of cycles for the acknowledgement phase
-    def receive_acknowledgement
+    # @param options [Hash] Options during acknowledgement reception.
+    # @option options [true, false] :ignore_acknowledgement Indicates that the acknowledgement
+    #   should not be checked for a pass/fail result. Rather, the tester will just be cycled 3 times.
+    # @option options [true, false] :expect_transaction_error Instead of verifying for a successful
+    #   transaction, verifies that a transaction error occurred.
+    # @note If both :ignore_acknowledgement and :expect_transaction_error are present,
+    #   :ignore_acknowledgement will take precedence.
+    def receive_acknowledgement(confirm: :success, **options)
       wait_trn
-      swd_dio.assert!(1)
-      swd_dio.assert!(0)
-      swd_dio.assert!(0)
+      if [:ignore, :none, :skip].include?(confirm)
+        log('Ignoring Acknowledgement Phase')
+        tester.cycle(repeat: 3)
+      elsif [:failure, :fail, :error].include?(confirm)
+        log('Confirming Error Encountered During Acknowledgement Phase')
+        swd_dio.assert!(0)
+        swd_dio.assert!(0)
+        swd_dio.assert!(1)
+      elsif confirm == :success
+        log('Confirming Success During Acknowledgement Phase')
+        swd_dio.assert!(1)
+        swd_dio.assert!(0)
+        swd_dio.assert!(0)
+      else
+        Origen.app!.fail!(message: "OrigenSWD: Origen SWD does not know how to confirm :#{confirm}")
+      end
       swd_dio.dont_care
     end
 
