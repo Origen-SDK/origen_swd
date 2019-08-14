@@ -1,3 +1,14 @@
+<a class="anchor release_tag" name="v1_1_2"></a>
+<h1><a href="#v1_1_2">Tag: v1.1.2</a></h1>
+
+##### Branch: 'master'
+
+##### by Corey Engelken on 14-Aug-2019 15:53PM
+
+
+Added a `:confirm` option to `#receive\_acknowledgement`, which can either ignore, check
+for transaction success, or check for transction failure.
+
 <a class="anchor release_tag" name="v1_1_1"></a>
 <h1><a href="#v1_1_1">Tag: v1.1.1</a></h1>
 

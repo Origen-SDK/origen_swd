@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    origen_swd (1.1.1)
+    origen_swd (1.1.2)
       origen (>= 0.7.36)
 
 GEM
