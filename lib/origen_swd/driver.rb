@@ -177,13 +177,12 @@ module OrigenSWD
     end
 
     # Waits appropriate number of cycles for the acknowledgement phase
-    # @param options [Hash] Options during acknowledgement reception.
-    # @option options [true, false] :ignore_acknowledgement Indicates that the acknowledgement
-    #   should not be checked for a pass/fail result. Rather, the tester will just be cycled 3 times.
-    # @option options [true, false] :expect_transaction_error Instead of verifying for a successful
-    #   transaction, verifies that a transaction error occurred.
-    # @note If both :ignore_acknowledgement and :expect_transaction_error are present,
-    #   :ignore_acknowledgement will take precedence.
+    # @param confirm [Symbol] Indicates what type of acknowledgement confirmation should be used. Options are:
+    #   * [:ignore, :none, :skip] -> Ignore the acknowledgement completely.
+    #   * [:failure, :fail, :error] -> Verify that the acknowledgement failured; that is,
+    #   * [:success] (Default) -> Verify the acknowledgement as normal.
+    # @param options [Hash] Placeholder for other/future options.
+    # @raise [RuntimeError] When an unrecongized :confirm option is given.
     def receive_acknowledgement(confirm: :success, **options)
       wait_trn
       if [:ignore, :none, :skip].include?(confirm)
