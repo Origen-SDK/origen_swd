@@ -69,7 +69,7 @@ GEM
       cri (~> 2.3)
     nesty (1.0.2)
     net-ldap (0.16.1)
-    nokogiri (1.10.1)
+    nokogiri (1.10.8)
       mini_portile2 (~> 2.4.0)
     origen (0.43.0)
       activesupport (~> 4.1)
