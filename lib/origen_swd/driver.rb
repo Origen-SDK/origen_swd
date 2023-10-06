@@ -14,6 +14,7 @@ module OrigenSWD
 
     # Customiz-ible 'turn-round cycle' (TRN) parameter (in cycles)
     attr_accessor :trn
+    attr_accessor :posedge_clk
 
     # Initialize class variables
     #
@@ -30,6 +31,7 @@ module OrigenSWD
       @current_apaddr = 0
       @orundetect = 0
       @trn = 0
+      @posedge_clk = '1'
     end
 
     # Write data from Debug Port
@@ -164,7 +166,7 @@ module OrigenSWD
       cc '[SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |'
       cc "[SWD] |   1   |   #{apndp}   |   #{rnw}   |   #{addr[0]}   |   #{addr[1]}   |   #{parity[0]}   |   0   |   1   |"
       cc '[SWD] -----------------------------------------------------------------'
-      swd_clk.drive(1)
+      swd_clk.drive(posedge_clk)
       swd_dio.drive!(1)                                   # send start bit (always 1)
       swd_dio.drive!(apndp)                               # send apndp bit
       swd_dio.drive!(rnw)                                 # send rnw bit
@@ -279,7 +281,7 @@ module OrigenSWD
       end
 
       cc options[:arm_debug_comment] if options.key?(:arm_debug_comment)
-      swd_clk.drive(1)
+      swd_clk.drive(posedge_clk)
 
       reg_overlay = extract_reg_overlay(reg)
       if reg_overlay && !options[:no_subr] && !Origen.mode.simulation?
