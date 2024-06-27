@@ -145,6 +145,7 @@ module OrigenSWD
       return reg_or_val.address if reg_or_val.respond_to?(:address)
       return reg_or_val.addr if reg_or_val.respond_to?(:addr)
       return reg_or_val if reg_or_val && options[:use_reg_or_val_if_you_must]
+
       fail 'No address given, if supplying a data value instead of a register object, you must supply an :address option'
     end
 
@@ -160,7 +161,7 @@ module OrigenSWD
     # @param [Integer] address Address of register that is being accessed
     def send_header(apndp, rnw, address)
       addr = address >> 2
-      parity  = apndp ^ rnw ^ (addr >> 3) ^ (addr >> 2) & (0x01) ^ (addr >> 1) & (0x01) ^ addr & 0x01
+      parity = apndp ^ rnw ^ (addr >> 3) ^ (addr >> 2) & (0x01) ^ (addr >> 1) & (0x01) ^ addr & 0x01
 
       cc '[SWD] -----------------------------------------------------------------'
       cc '[SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |'
@@ -185,7 +186,7 @@ module OrigenSWD
     #   * [:success] (Default) -> Verify the acknowledgement as normal.
     # @param options [Hash] Placeholder for other/future options.
     # @raise [RuntimeError] When an unrecongized :confirm option is given.
-    def receive_acknowledgement(options={})
+    def receive_acknowledgement(options = {})
       confirm = options[:confirm] || :success
       wait_trn
       if [:ignore, :none, :skip].include?(confirm)
