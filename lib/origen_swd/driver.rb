@@ -185,7 +185,8 @@ module OrigenSWD
     #   * [:success] (Default) -> Verify the acknowledgement as normal.
     # @param options [Hash] Placeholder for other/future options.
     # @raise [RuntimeError] When an unrecongized :confirm option is given.
-    def receive_acknowledgement(confirm: :success, **options)
+    def receive_acknowledgement(options={})
+      confirm = options[:confirm] || :success
       wait_trn
       if [:ignore, :none, :skip].include?(confirm)
         log('Ignoring Acknowledgement Phase')
