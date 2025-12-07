@@ -161,7 +161,8 @@ module OrigenSWD
     # @param [Integer] address Address of register that is being accessed
     def send_header(apndp, rnw, address)
       addr = address >> 2
-      parity = apndp ^ rnw ^ (addr >> 3) ^ (addr >> 2) & (0x01) ^ (addr >> 1) & (0x01) ^ addr & 0x01
+      i = [apndp, rnw, addr[0], addr[1]].join('')
+      parity = swd_xor_calc(4, i.to_i(2))
 
       cc '[SWD] -----------------------------------------------------------------'
       cc '[SWD] | Start |  AP   | Read  | AD[2] | AD[3] |  Par  | Stop  | Park  |'
