@@ -1,3 +1,14 @@
+<a class="anchor release_tag" name="v2_0_0"></a>
+<h1><a href="#v2_0_0">Tag: v2.0.0</a></h1>
+
+##### Branch: 'master'
+
+##### by Corey Engelken on 13-Dec-2025 07:19AM
+
+
+Bugfix for the header parity calculation.
+Potentially breaking for anything relying on the previous calculations.
+
 <a class="anchor release_tag" name="v1_1_3"></a>
 <h1><a href="#v1_1_3">Tag: v1.1.3</a></h1>
 
